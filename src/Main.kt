@@ -430,7 +430,13 @@ fun main() {
                                 print("\nDigite novamente sua senha: ")
                                 val inputSenhaConfirmacao = readln().trim()
 
-                                if (inputSenha != inputSenhaConfirmacao) {
+                                if (inputSenha.isEmpty()){
+                                    println(COR.VERMELHO + "ERRO: " + COR.AMARELO + " A senha precisa ser preenchida. Por favor digite uma senha" + COR.RESET)
+                                }
+                                else if (inputSenha.length < 8) {
+                                    println(COR.VERMELHO + "ERRO: " + COR.AMARELO + " A senha precisa possuir 8 ou mais caracteres. Por favor digite uma nova senha" + COR.RESET)
+                                }
+                                else if (inputSenha != inputSenhaConfirmacao) {
                                     println(COR.VERMELHO + "ERRO: " + COR.AMARELO + " As senhas não coincidem por favor digite a senha novamente" + COR.RESET)
                                 } else {
                                     println(COR.VERDE + "Senha cadastrada com sucesso! Prosseguindo..." + COR.RESET)
@@ -586,7 +592,13 @@ fun main() {
                                 print("\nDigite novamente sua senha: ")
                                 val inputSenhaConfirmacao = readln().trim()
 
-                                if (inputSenha != inputSenhaConfirmacao) {
+                                if (inputSenha.isEmpty()){
+                                    println(COR.VERMELHO + "ERRO: " + COR.AMARELO + " A senha precisa ser preenchida. Por favor digite uma senha" + COR.RESET)
+                                }
+                                else if (inputSenha.length < 8) {
+                                    println(COR.VERMELHO + "ERRO: " + COR.AMARELO + " A senha precisa possuir 8 ou mais caracteres. Por favor digite uma nova senha" + COR.RESET)
+                                }
+                                else if (inputSenha != inputSenhaConfirmacao) {
                                     println(COR.VERMELHO + "ERRO: " + COR.AMARELO + " As senhas não coincidem por favor digite a senha novamente" + COR.RESET)
                                 } else {
                                     println(COR.VERDE + "Senha cadastrada com sucesso! Prosseguindo..." + COR.RESET)
