@@ -10,7 +10,7 @@ data class Organizador(
     val email: String,
     val senha: String,
     val cnpj: String? = null,
-    val nomeSocial: String? = null,
+    val razaoSocial: String? = null,
     val nomeFantasia: String? = null,
     val ativo: Boolean = true
 )
