@@ -54,98 +54,310 @@ fun main() {
                         println(lineBar)
                         println(COR.VERDE + "Login realizado com sucesso!" + COR.RESET)
                         println(lineBar)
-                    }
+                        var sessaoAtiva = true
 
 
-                    var sessaoAtiva = true
-                    while (sessaoAtiva) {
-                        println("\n---- MENU LOGADO ----")
-                        println(lineBar)
-
-                        // Logica para menu especifico para cada tipo de usuario
-                        if (organizadorLogado != null) {
-                            println("Olá Organizador ${organizadorLogado.nome}!")
-                            println("1) Meu Perfil")
-                            println("2) Alterar dados do Perfil")
-                            println("3) Inativar Minha Conta")
-                            println("4) Gerenciar Eventos")
+                        while (sessaoAtiva) {
+                            println("\n---- MENU LOGADO ----")
                             println(lineBar)
-                        } else if (usuarioLogado != null){
-                            println("Olá Usuario ${usuarioLogado.nome}!")
-                            println("1) Meu Perfil")
-                            println("2) Alterar dados do Perfil")
-                            println("3) Inativar Minha Conta")
-                            println("4) Ver feed de Eventos")
-                            println(lineBar)
-                        }
-                        println("0) Sair (logout)")
-                        println(lineBar)
 
-                        println("Escolha: ")
-                        val opcaoMenuLogado = readln().toIntOrNull() ?: 0
-                        println(lineBar)
-
-                        when(opcaoMenuLogado) {
-                            0 -> {
-                                println(COR.AMARELO + "Realizando logout..." + COR.RESET)
-                                sessaoAtiva = false
+                            // Logica para menu especifico para cada tipo de usuario
+                            if (organizadorLogado != null) {
+                                println("Olá Organizador ${organizadorLogado.nome}!")
+                                println("1) Meu Perfil")
+                                println("2) Alterar dados do Perfil")
+                                println("3) Inativar Minha Conta")
+                                println("4) Gerenciar Eventos")
+                                println(lineBar)
+                            } else if (usuarioLogado != null) {
+                                println("Olá Usuario ${usuarioLogado.nome}!")
+                                println("1) Meu Perfil")
+                                println("2) Alterar dados do Perfil")
+                                println("3) Inativar Minha Conta")
+                                println("4) Ver feed de Eventos")
+                                println(lineBar)
                             }
-                            1 -> {
-                                // dados do usuario organizador
-                                println(lineBar)
-                                println(COR.AMARELO + "--- SEU PERFIL (ORGANIZADOR) ---" + COR.RESET + "\n")
-                                println("Nome: ${COR.VERDE}${organizadorLogado?.nome}${COR.RESET}")
-                                println("Email: ${organizadorLogado?.email}")
-                                println("Gênero: ${organizadorLogado?.sexo}")
-                                println(lineBar)
-                                // dados relacionados a idade e nascimento
-                                val hoje = LocalDate.now()
-                                val idadeExataCalculada = Period.between(organizadorLogado?.dataNacimento, hoje)
-                                println("Data de Nascimento: ${organizadorLogado?.dataNacimento?.format(formatterDate)}")
-                                println("Idade: ${COR.VERDE}${idadeExataCalculada.years} Anos, ${idadeExataCalculada.months} Meses, ${idadeExataCalculada.days} Dias")
+                            println("0) Sair (logout)")
+                            println(lineBar)
 
-                                // dados empresariais
-                                if(organizadorLogado?.cnpj != null) {
-                                    println(lineBar)
-                                    println(COR.AMARELO + "--- DADOS DA EMPRESA ---" + COR.RESET)
-                                    println("Razão Social: ${organizadorLogado.razaoSocial}")
-                                    println("Nome Fantasia ${organizadorLogado.nomeFantasia}")
-                                    println("CNPJ ${organizadorLogado.cnpj}")
-                                } else {
-                                    println(lineBar)
-                                    println("Perfil de pessoa Física, Sem dados Empresariais cadastrados")
+                            println("Escolha: ")
+                            val opcaoMenuLogado = readln().toIntOrNull() ?: 0
+                            println(lineBar)
+
+                            when (opcaoMenuLogado) {
+                                0 -> {
+                                    println(COR.AMARELO + "Realizando logout..." + COR.RESET)
+                                    sessaoAtiva = false
                                 }
-                                println(lineBar)
-                                println("Pressione enter para voltar")
-                                readln()
+                                // --- OPÇÃO 1: MEU PERFIL ---
+                                1 -> {
+                                    if (organizadorLogado != null) {
+                                        // dados do usuario organizador
+                                        println(lineBar)
+                                        println(COR.AMARELO + "--- SEU PERFIL (ORGANIZADOR) ---" + COR.RESET + "\n")
+                                        println("Nome: ${COR.VERDE}${organizadorLogado.nome}${COR.RESET}")
+                                        println("Email: ${organizadorLogado.email}")
+                                        println("Gênero: ${organizadorLogado.sexo}")
+                                        println(lineBar)
+                                        // dados relacionados a idade e nascimento
+                                        val hoje = LocalDate.now()
+                                        val idadeExataCalculada = Period.between(organizadorLogado.dataNacimento, hoje)
+                                        println(
+                                            "Data de Nascimento: ${organizadorLogado.dataNacimento.format(formatterDate)}"
+                                        )
+                                        println("Idade: ${COR.VERDE}${idadeExataCalculada.years} Anos, ${idadeExataCalculada.months} Meses, ${idadeExataCalculada.days} Dias")
+
+                                        // dados empresariais
+                                        if (organizadorLogado.cnpj != null) {
+                                            println(lineBar)
+                                            println(COR.AMARELO + "--- DADOS DA EMPRESA ---" + COR.RESET)
+                                            println("Razão Social: ${organizadorLogado.razaoSocial}")
+                                            println("Nome Fantasia ${organizadorLogado.nomeFantasia}")
+                                            println("CNPJ ${organizadorLogado.cnpj}")
+                                        } else {
+                                            println(lineBar)
+                                            println("Perfil de pessoa Física, Sem dados Empresariais cadastrados")
+                                        }
+                                        println(lineBar)
+                                        println("Pressione enter para voltar")
+                                        readln()
+                                    }
+                                    // Perfil do usuario comum
+                                    else if (usuarioLogado != null) {
+                                        println(lineBar)
+                                        println(COR.AMARELO + "--- SEU PERFIL (USUARIO) ---" + COR.RESET)
+
+                                        // dados do usuario comum
+                                        println("Nome: ${COR.VERDE}${usuarioLogado.nome}${COR.RESET}")
+                                        println("Email: ${usuarioLogado.email}")
+                                        println("Gênero: ${usuarioLogado.sexo}")
+                                        println(lineBar)
+
+                                        // dados relacionados a idade e nascimento
+                                        val hoje = LocalDate.now()
+                                        val idadeExataCalculada = Period.between(usuarioLogado.dataNacimento, hoje)
+                                        println("Data de Nascimento: ${usuarioLogado.dataNacimento.format(formatterDate)}")
+                                        println("Idade: ${COR.VERDE}${idadeExataCalculada.years} Anos, ${idadeExataCalculada.months} Meses, ${idadeExataCalculada.days} Dias")
+
+                                        println(lineBar)
+                                        println("Pressione enter para voltar")
+                                        readln()
+                                    }
+                                }
+                                // --- OPÇÃO 2: ALTERAR DADOS ---
+                                2 -> {
+                                    var alterandoPerfil = true
+                                    while (alterandoPerfil) {
+                                        if (organizadorLogado != null) {
+                                            // Alterar usuario organizador
+
+                                            println(lineBar)
+                                            println(COR.AMARELO + "--- ALTERAR DADOS ---" + COR.RESET)
+                                            println("O que você deseja alterar?")
+                                            println("1) Nome")
+                                            println("2) Senha")
+                                            println("3) Sexo/Gênero")
+                                            println("4) Dados Empresariais (Adicionar ou Editar")
+                                            println("0) Cancelar")
+                                            print("Opção: ")
+                                            val opcaoAlterar = readln().toIntOrNull() ?: 0
+
+                                            when (opcaoAlterar) {
+                                                1 -> {
+                                                    print("Novo Nome: ")
+                                                    val novoNome = readln().trim()
+                                                    if (novoNome.length >= 2) {
+                                                        organizadorLogado.nome = novoNome
+                                                        println(COR.VERDE + "Nome atualizado!" + COR.RESET)
+                                                    } else println(COR.VERMELHO + "Nome inválido." + COR.RESET)
+                                                }
+
+                                                2 -> {
+                                                    print("Nova Senha: ")
+                                                    val novaSenha = readln().trim()
+                                                    print("Confirme a Nova Senha: ")
+                                                    val novaSenhaConfirmacao = readln().trim()
+                                                    if (novaSenha.isNotEmpty() && novaSenha == novaSenhaConfirmacao) {
+                                                        organizadorLogado.senha = novaSenha
+                                                        println(COR.VERDE + "Senha atualizada!" + COR.RESET)
+                                                    } else println(COR.VERMELHO + "Senhas não conferem." + COR.RESET)
+                                                }
+
+                                                3 -> {
+                                                    println("Novo Gênero (1-Mascculino, 2-Feminino, 3-Outros): ")
+                                                    val opcaoSexo = readln().toIntOrNull() ?: 3
+                                                    organizadorLogado.sexo = when (opcaoSexo) {
+                                                        1 -> Sexo.MASCULINO; 2 -> Sexo.FEMININO; else -> Sexo.OUTROS
+                                                    }
+                                                    println(COR.VERDE + "Gênero atualizado!" + COR.RESET)
+                                                }
+
+                                                4 -> {
+                                                    println(lineBar)
+                                                    if (organizadorLogado.cnpj == null) {
+                                                        println(COR.AMARELO + "Atualmente você é Pessoa Física." + COR.RESET)
+                                                        println("Deseja adicionar dados de Empresa (Tornar-se PJ)?")
+                                                        println("1) Sim \n2) Não")
+                                                        val opcaoTornarPJ = readln().toIntOrNull() ?: 2
+
+                                                        if (opcaoTornarPJ == 1) {
+                                                            print("Digite o CNPJ (14 números): ")
+                                                            val novoCnpj = readln().trim()
+                                                            if (novoCnpj.length == 14) {
+                                                                print("Razão Social: ")
+                                                                val novaRazaoSocial = readln().trim()
+                                                                print("Nome Fantasia: ")
+                                                                val novoNomeFantasia = readln().trim()
+
+                                                                // AQUI ACONTECE O UPGRADE
+                                                                organizadorLogado.cnpj = novoCnpj
+                                                                organizadorLogado.razaoSocial = novaRazaoSocial
+                                                                organizadorLogado.nomeFantasia = novoNomeFantasia
+
+                                                                println(COR.VERDE + "Sucesso! Agora você é um Organizador PJ." + COR.RESET)
+                                                            } else {
+                                                                println(COR.VERMELHO + "CNPJ inválido." + COR.RESET)
+                                                            }
+                                                        }
+                                                    } else {
+                                                        println(COR.AMARELO + "--- EDITAR DADOS DA EMPRESA ---" + COR.RESET)
+                                                        println("CNPJ Atual: ${organizadorLogado.cnpj}")
+                                                        println("1) Editar Nome Fantasia/Razão Social")
+                                                        println("2) Corrigir CNPJ")
+                                                        println("0) Voltar")
+                                                        val opcaoEmpresa = readln().toIntOrNull() ?: 0
+
+                                                        if (opcaoEmpresa == 1) {
+                                                            print("Nova Razão Social: ")
+                                                            organizadorLogado.razaoSocial = readln().trim()
+                                                            print("Novo Nome Fantasia: ")
+                                                            organizadorLogado.nomeFantasia = readln().trim()
+                                                            println(COR.VERDE + "Dados empresariais atualizados!" + COR.RESET)
+                                                        } else if (opcaoEmpresa == 2) {
+                                                            print("Novo CNPJ: ")
+                                                            val novoCnpj = readln().trim()
+                                                            if (novoCnpj.length == 14) {
+                                                                organizadorLogado.cnpj = novoCnpj
+                                                                println(COR.VERDE + "CNPJ atualizado!" + COR.RESET)
+                                                            } else {
+                                                                println(COR.VERMELHO + "CNPJ inválido." + COR.RESET)
+                                                            }
+                                                        }
+                                                    }
+                                                }
+
+                                                0 -> {
+                                                    println(COR.AMARELO + "Operação cancelada." + COR.RESET)
+                                                    alterandoPerfil = false
+                                                }
+
+                                                else -> println(COR.VERMELHO + "Opção inválida." + COR.RESET)
+                                            }
+
+                                        } else if (usuarioLogado != null) {
+                                            // Alterar usuario comum
+                                            println(lineBar)
+                                            println(COR.AMARELO + "--- ALTERAR DADOS ---" + COR.RESET)
+                                            println("O que você deseja alterar?")
+                                            println("1) Nome")
+                                            println("2) Senha")
+                                            println("3) Sexo/Gênero")
+                                            println("0) Cancelar")
+                                            print("Opção: ")
+                                            val opcaoAlterar = readln().toIntOrNull() ?: 0
+
+                                            when (opcaoAlterar) {
+                                                1 -> {
+                                                    print("Novo Nome: ")
+                                                    val novoNome = readln().trim()
+                                                    if (novoNome.length >= 2) {
+                                                        usuarioLogado.nome = novoNome
+                                                        println(COR.VERDE + "Nome atualizado!" + COR.RESET)
+                                                    } else println(COR.VERMELHO + "Nome inválido." + COR.RESET)
+                                                }
+
+                                                2 -> {
+                                                    print("Nova Senha: ")
+                                                    val novaSenha = readln().trim()
+                                                    print("Confirme a Nova Senha: ")
+                                                    val novaSenhaConfirmacao = readln().trim()
+                                                    if (novaSenha.isNotEmpty() && novaSenha == novaSenhaConfirmacao) {
+                                                        usuarioLogado.senha = novaSenha
+                                                        println(COR.VERDE + "Senha atualizada!" + COR.RESET)
+                                                    } else println(COR.VERMELHO + "Senhas não conferem." + COR.RESET)
+                                                }
+
+                                                3 -> {
+                                                    println("Novo Gênero (1-Mascculino, 2-Feminino, 3-Outros): ")
+                                                    val opcaoSexo = readln().toIntOrNull() ?: 3
+                                                    usuarioLogado.sexo = when (opcaoSexo) {
+                                                        1 -> Sexo.MASCULINO; 2 -> Sexo.FEMININO; else -> Sexo.OUTROS
+                                                    }
+                                                    println(COR.VERDE + "Gênero atualizado!" + COR.RESET)
+                                                }
+
+                                                0 -> {
+                                                    println("Operação cancelada.")
+                                                    alterandoPerfil = false
+                                                }
+
+                                                else -> println("Opção inválida.")
+                                            }
+
+                                        }
+                                    }
+                                    println("Pressione ENTER para voltar...")
+                                    readln()
+                                }
+
+                                // --- OPÇÃO 3: INATIVAR CONTA ---
+                                3 -> {
+                                    println(lineBar)
+                                    println(COR.VERMELHO + "ATENÇÃO: Você está prestes a desativar sua conta." + COR.RESET)
+                                    println("Para entrar novamente, você precisará usar a opção 'Reativar Conta' no menu principal.")
+                                    println("Tem certeza? (1) SIM, (2) NÃO)")
+                                    val confirmacao = readln().toIntOrNull() ?: 2
+
+                                    if (confirmacao == 1) {
+                                        if (organizadorLogado != null) {
+                                            // TODO: Futuramente, verificar se ele tem eventos ativos antes de deixar inativar
+                                            organizadorLogado.ativo = false
+                                            println(COR.VERMELHO + "Conta de Organizador inativada." + COR.RESET)
+                                            sessaoAtiva = false // Desloga automaticamente
+                                        } else if (usuarioLogado != null) {
+                                            usuarioLogado.ativo = false
+                                            println(COR.VERMELHO + "Conta de Usuário inativada." + COR.RESET)
+                                            sessaoAtiva = false // Desloga automaticamente
+                                        }
+
+                                    } else {
+                                        println(COR.VERDE + "Operação cancelada." + COR.RESET)
+                                        println("Pressione ENTER para voltar...")
+                                        readln()
+                                    }
+                                }
+
+                                // --- OPÇÃO 4: FUNCIONALIDADES DAS TAREFAS 2 E 3 ---
+                                4 -> {
+                                    if (organizadorLogado != null) {
+                                        println(COR.AMARELO + "Área de Gerenciamento de Eventos (Em construção pela tarefa (2. Desenvolvedor de Eventos (Lado Organizador -> João Guilherme))" + COR.RESET)
+                                    } else {
+                                        println(COR.AMARELO + "Feed de Eventos (Em construção pela tarefa (3. Desenvolvedor de Experiência do Cliente (Lado Usuário) -> Gustavo)" + COR.RESET)
+                                    }
+                                    readln()
+                                }
                             }
-                            2 -> {
-                                println(lineBar)
-                                println(COR.AMARELO + "--- SEU PERFIL (USUARIO) ---" + COR.RESET)
-
-                                // dados do usuario comum
-                                println("Nome: ${COR.VERDE}${usuarioLogado?.nome}${COR.RESET}")
-                                println("Email: ${usuarioLogado?.email}")
-                                println("Gênero: ${usuarioLogado?.sexo}")
-                                println(lineBar)
-
-                                // dados relacionados a idade e nascimento
-                                val hoje = LocalDate.now()
-                                val idadeExataCalculada = Period.between(usuarioLogado?.dataNacimento, hoje)
-                                println("Data de Nascimento: ${usuarioLogado?.dataNacimento?.format(formatterDate)}")
-                                println("Idade: ${COR.VERDE}${idadeExataCalculada.years} Anos, ${idadeExataCalculada.months} Meses, ${idadeExataCalculada.days} Dias")
-
-                                println(lineBar)
-                                println("Pressione enter para voltar")
-                                readln()
-                            }
-                            3 -> {}
-                            4 -> {}
                         }
+                    } else {
+                        println(COR.VERMELHO + "ACESSO NEGADO: Sua conta está inativa." + COR.RESET)
+                        println("Utilize a opção 3 no menu principal para reativar.")
                     }
-                } else {
-            println("ERRO: Usuário ou senha inválidos (ou conta inativa).")
-        }
+                }
+                else {
+                        println("ERRO: Usuário ou senha inválidos (ou conta inativa).")
+                    }
+
+
             }
 
             2 -> {
@@ -181,8 +393,6 @@ fun main() {
 
                         // Para a verificação de idade na data de nascimento
                         val idadeMinima = 12
-
-
 
                         while (cicloCriarUsuarioComum) {
                             while (cicloEmail) {
@@ -338,9 +548,7 @@ fun main() {
                         var nomeFantasia: String? = null
 
                         // Para a verificação de idade na data de nascimento
-                        val idadeMinima = 12
-
-
+                        val idadeMinima = 18
 
                         while (cicloCriarOrganizador) {
                             while (cicloEmail) {
@@ -432,7 +640,7 @@ fun main() {
                                     else if (dataConvertida.isBefore(hoje.minusYears(120))) {
                                         println(COR.VERMELHO + "ERRO: Data inválida." + COR.RESET)
                                     }
-                                    // Se a data de nascimento for DEPOIS de (Hoje - 12 anos), a pessoa ainda não fez 12.
+                                    // Se a data de nascimento for DEPOIS de (Hoje - 18 anos), a pessoa ainda não fez 18.
                                     else if (dataConvertida.isAfter(LocalDate.now().minusYears(idadeMinima.toLong()))) {
                                         println(COR.VERMELHO + "ERRO: " + COR.AMARELO + "Você precisa ter pelo menos" + COR.NEGRITO +  COR.VERDE + " $idadeMinima anos " + COR.VERMELHO +"para se cadastrar." + COR.RESET)
 
@@ -478,10 +686,10 @@ fun main() {
                                         println(COR.VERMELHO + "CNPJ inválido (deve conter 14 dígitos)." + COR.AMARELO + " Voltando...")
                                         println(lineBar)
                                     }
+                                } else {
+                                    cadastrarEmpresa = false
                                 }
                             }
-
-
 
                             println(lineBar)
                             println("Deseja refazer todo o cadastro? \n1) Sim \n2) Não")
@@ -492,6 +700,11 @@ fun main() {
                                 cicloEmail = true
                                 cicloSenha = true
                                 cicloDataNacimento = true
+
+                                cnpj = null
+                                razaoSocial = null
+                                nomeFantasia = null
+
                             } else {
                                 try {
                                     listaOrganizadores.add(Organizador(nome, dataNascimento, sexo, email, senha, cnpj, razaoSocial, nomeFantasia))
@@ -508,7 +721,52 @@ fun main() {
                 }
             }
             3 -> {
+                println(lineBar)
+                println(COR.AMARELO + "--- REATIVAR CONTA ---" + COR.RESET)
+                println("Informe suas credenciais para reativar seu acesso.")
 
+                print("\nDigite seu E-mail cadastrado: ")
+                val emailBusca = readln().trim()
+
+                print("Digite sua Senha: ")
+                val senhaBusca = readln().trim()
+
+                // 1. Procura na lista de Usuários Comuns
+                val usuarioEncontrado = listaUsuarios.find { it.email == emailBusca && it.senha == senhaBusca }
+
+                // 2. Procura na lista de Organizadores
+                val organizadorEncontrado = listaOrganizadores.find { it.email == emailBusca && it.senha == senhaBusca }
+
+                // Lógica de Reativação
+                if (usuarioEncontrado != null) {
+                    if (!usuarioEncontrado.ativo) {
+                        usuarioEncontrado.ativo = true
+                        println(lineBar)
+                        println(COR.VERDE + "SUCESSO: Conta de Usuário Comum reativada!" + COR.RESET)
+                        println("Você já pode fazer login na Opção 1.")
+                    } else {
+                        println(COR.AMARELO + "Atenção: Sua conta já está ativa. Basta fazer login." + COR.RESET)
+                    }
+                }
+                else if (organizadorEncontrado != null) {
+                    if (!organizadorEncontrado.ativo) {
+                        organizadorEncontrado.ativo = true
+                        println(lineBar)
+                        println(COR.VERDE + "SUCESSO: Conta de Organizador reativada!" + COR.RESET)
+                        println("Você já pode fazer login na Opção 1.")
+                    } else {
+                        println(COR.AMARELO + "Atenção: Sua conta já está ativa. Basta fazer login." + COR.RESET)
+                    }
+                }
+                else {
+                    // Se não achou em nenhuma lista ou a senha está errada
+                    println(lineBar)
+                    println(COR.VERMELHO + "ERRO: Conta não encontrada ou credenciais inválidas." + COR.RESET)
+                }
+
+                println(lineBar)
+                println("Pressione ENTER para voltar ao menu principal...")
+                readln()
             }
         }
     }

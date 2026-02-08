@@ -1,3 +1,5 @@
 package entities
 
-data class Evento()
+data class Evento(
+    val nome : String
+)

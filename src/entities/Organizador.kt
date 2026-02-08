@@ -4,13 +4,13 @@ import enums.Sexo
 import java.time.LocalDate
 
 data class Organizador(
-    val nome: String,
-    val dataNacimento: LocalDate,
-    val sexo: Sexo,
+    var nome: String,
+    var dataNacimento: LocalDate,
+    var sexo: Sexo,
     val email: String,
-    val senha: String,
-    val cnpj: String? = null,
-    val razaoSocial: String? = null,
-    val nomeFantasia: String? = null,
-    val ativo: Boolean = true
+    var senha: String,
+    var cnpj: String? = null,
+    var razaoSocial: String? = null,
+    var nomeFantasia: String? = null,
+    var ativo: Boolean = true
 )
