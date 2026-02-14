@@ -1,6 +1,6 @@
 package enums
 
-enum class TipoEvento(val descricao: String) {
+enum class CategoriaEvento(val descricao: String) {
     SOCIAL("Social"),
     CORPORATIVO("Corporativo"),
     ACADEMICO("Acadêmico"),

@@ -135,8 +135,8 @@ fun main() {
 
                                         // dados relacionados a idade e nascimento
                                         val hoje = LocalDate.now()
-                                        val idadeExataCalculada = Period.between(usuarioLogado.dataNacimento, hoje)
-                                        println("Data de Nascimento: ${usuarioLogado.dataNacimento.format(formatterDate)}")
+                                        val idadeExataCalculada = Period.between(usuarioLogado.dataNascimento, hoje)
+                                        println("Data de Nascimento: ${usuarioLogado.dataNascimento.format(formatterDate)}")
                                         println("Idade: ${COR.VERDE}${idadeExataCalculada.years} Anos, ${idadeExataCalculada.months} Meses, ${idadeExataCalculada.days} Dias")
 
                                         println(lineBar)
