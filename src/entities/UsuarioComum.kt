@@ -5,7 +5,7 @@ import java.time.LocalDate
 
 data class UsuarioComum(
     var nome: String,
-    var dataNacimento: LocalDate,
+    var dataNascimento: LocalDate,
     var sexo: Sexo,
     val email: String,
     var senha: String,
