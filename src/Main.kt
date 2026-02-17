@@ -11,7 +11,7 @@ import java.time.Period
 import util.ConsoleTextColor as COR
 
 fun main() {
-    // Banco de dados na memoria para os usuarios e organizadores
+    // Banco de dados na memória para os usuários e organizadores
     val listaUsuarios = mutableListOf<UsuarioComum>()
     val listaOrganizadores = mutableListOf<Organizador>()
     val listaEventos = mutableListOf<Evento>()
@@ -29,8 +29,8 @@ fun main() {
         println("Bem vindo ao Dedê Eventos")
         println(lineBar)
 
-        // Menu de login/reegistro de usuario
-        println("Você já é um usuario cadastrado?\n" +
+        // Menu de login/registro de usuario
+        println("Você já é um usuário cadastrado?\n" +
                 "Escolha uma opção digitando os números\n" +
                 "1) Sim - Fazer login\n" +
                 "2) Não - Registrar-se (Novo Usuário)\n" +
@@ -52,7 +52,7 @@ fun main() {
                 println("Digite sua Senha: ")
                 val senhaLogin = readln().trim()
 
-                // varre a lista para encontrar o usario
+                // varre a lista para encontrar o usuário
                 val usuarioLogado = listaUsuarios.find { it.email == emailLogin && it.senha == senhaLogin}
                 val organizadorLogado = listaOrganizadores.find { it.email == emailLogin && it.senha == senhaLogin}
 
@@ -77,7 +77,7 @@ fun main() {
                                 println("4) Gerenciar Eventos")
                                 println(lineBar)
                             } else if (usuarioLogado != null) {
-                                println("Olá Usuario ${usuarioLogado.nome}!")
+                                println("Olá Usuário ${usuarioLogado.nome}!")
                                 println("1) Meu Perfil")
                                 println("2) Alterar dados do Perfil")
                                 println("3) Inativar Minha Conta")
@@ -108,9 +108,9 @@ fun main() {
                                         println(lineBar)
                                         // dados relacionados a idade e nascimento
                                         val hoje = LocalDate.now()
-                                        val idadeExataCalculada = Period.between(organizadorLogado.dataNacimento, hoje)
+                                        val idadeExataCalculada = Period.between(organizadorLogado.dataNascimento, hoje)
                                         println(
-                                            "Data de Nascimento: ${organizadorLogado.dataNacimento.format(formatterDate)}"
+                                            "Data de Nascimento: ${organizadorLogado.dataNascimento.format(formatterDate)}"
                                         )
                                         println("Idade: ${COR.VERDE}${idadeExataCalculada.years} Anos, ${idadeExataCalculada.months} Meses, ${idadeExataCalculada.days} Dias")
 
@@ -126,13 +126,13 @@ fun main() {
                                             println("Perfil de pessoa Física, Sem dados Empresariais cadastrados")
                                         }
                                         println(lineBar)
-                                        println("Pressione enter para voltar")
+                                        println("Pressione ENTER para voltar...")
                                         readln()
                                     }
                                     // Perfil do usuario comum
                                     else if (usuarioLogado != null) {
                                         println(lineBar)
-                                        println(COR.AMARELO + "--- SEU PERFIL (USUARIO) ---" + COR.RESET)
+                                        println(COR.AMARELO + "--- SEU PERFIL (USUÁRIO) ---" + COR.RESET)
 
                                         // dados do usuario comum
                                         println("Nome: ${COR.VERDE}${usuarioLogado.nome}${COR.RESET}")
@@ -147,7 +147,7 @@ fun main() {
                                         println("Idade: ${COR.VERDE}${idadeExataCalculada.years} Anos, ${idadeExataCalculada.months} Meses, ${idadeExataCalculada.days} Dias")
 
                                         println(lineBar)
-                                        println("Pressione enter para voltar")
+                                        println("Pressione ENTER para voltar...")
                                         readln()
                                     }
                                 }
@@ -191,7 +191,7 @@ fun main() {
                                                 }
 
                                                 3 -> {
-                                                    println("Novo Gênero (1-Mascculino, 2-Feminino, 3-Outros): ")
+                                                    println("Novo Gênero (1-Masculino, 2-Feminino, 3-Outros): ")
                                                     val opcaoSexo = readln().toIntOrNull() ?: 3
                                                     organizadorLogado.sexo = when (opcaoSexo) {
                                                         1 -> Sexo.MASCULINO; 2 -> Sexo.FEMININO; else -> Sexo.OUTROS
@@ -295,7 +295,7 @@ fun main() {
                                                 }
 
                                                 3 -> {
-                                                    println("Novo Gênero (1-Mascculino, 2-Feminino, 3-Outros): ")
+                                                    println("Novo Gênero (1-Masculino, 2-Feminino, 3-Outros): ")
                                                     val opcaoSexo = readln().toIntOrNull() ?: 3
                                                     usuarioLogado.sexo = when (opcaoSexo) {
                                                         1 -> Sexo.MASCULINO; 2 -> Sexo.FEMININO; else -> Sexo.OUTROS
@@ -308,7 +308,7 @@ fun main() {
                                                     alterandoPerfil = false
                                                 }
 
-                                                else -> println("Opção inválida.")
+                                                else -> println(COR.VERMELHO + "Opção inválida!" + COR.RESET)
                                             }
 
                                         }
@@ -327,13 +327,24 @@ fun main() {
 
                                     if (confirmacao == 1) {
                                         if (organizadorLogado != null) {
+                                            val possuiEventosAtivos = listaEventos.any {it.idOrganizador.toString() == organizadorLogado.email && it.ativo}
+                                            if (possuiEventosAtivos) {
+                                                println("⚠️ Você possui eventos ativos. Não é possível inativar a conta.")
+                                                println("Pressione ENTER para voltar...")
+                                                readln()
+                                            } else {
+                                                organizadorLogado.ativo = false
+                                                println(COR.VERMELHO + "Conta de Organizador inativada." + COR.RESET)
+                                                sessaoAtiva = false // Desloga automaticamente
+                                            }
+
                                             // TODO: Futuramente, verificar se ele tem eventos ativos antes de deixar inativar
-                                            organizadorLogado.ativo = false
-                                            println(COR.VERMELHO + "Conta de Organizador inativada." + COR.RESET)
-                                            sessaoAtiva = false // Desloga automaticamente
+                                            // organizadorLogado.ativo = false
+                                            // println(COR.VERMELHO + "Conta de Organizador desativada." + COR.RESET)
+                                            // sessaoAtiva = false // Desloga automaticamente
                                         } else if (usuarioLogado != null) {
                                             usuarioLogado.ativo = false
-                                            println(COR.VERMELHO + "Conta de Usuário inativada." + COR.RESET)
+                                            println(COR.VERMELHO + "Conta de Usuário desativada." + COR.RESET)
                                             sessaoAtiva = false // Desloga automaticamente
                                         }
 
@@ -898,27 +909,27 @@ fun main() {
             2 -> {
                 println("\n---- REGISTRO DE NOVO USUÁRIO ----")
                 println("Para qual finalidade gostaria de Criar sua conta?")
-                println("1) Quero participar de Eventos (Usuario Comum)")
+                println("1) Quero participar de Eventos (Usuário Comum)")
                 println("2) Quero Organizar Eventos (Conta de Organizador")
                 println("0) Voltar")
                 println(lineBar)
 
-                val opcaoResgistroConta = readln().toIntOrNull() ?: 0
+                val opcaoRegistroConta = readln().toIntOrNull() ?: 0
                 println(lineBar)
-                when(opcaoResgistroConta) {
+                when(opcaoRegistroConta) {
                     0 -> {
                         println("Voltando..")
                     }
                     1 -> {
-                        println(COR.AMARELO + "--- CRIANDO PERFIL (USUARIO) ---" + COR.RESET)
-                        // Variaveis para o ciclo de vida da criação do usuario e contramedidas contra erros do usuario possibilitando repetição
+                        println(COR.AMARELO + "--- CRIANDO PERFIL (USUÁRIO) ---" + COR.RESET)
+                        // Variáveis para o ciclo de vida da criação do usuario e contramedidas contra erros do usuario possibilitando repetição
                         var cicloCriarUsuarioComum = true
                         var cicloEmail = true
                         var cicloSenha = true
                         var cicloNome = true
-                        var cicloDataNacimento = true
+                        var cicloDataNascimento = true
 
-                        // variaveis para armazenar os dados do usuario de forma segura
+                        // variáveis para armazenar os dados do usuario de forma segura
                         var nome = ""
                         var email = ""
                         var senha = ""
@@ -931,20 +942,20 @@ fun main() {
 
                         while (cicloCriarUsuarioComum) {
                             while (cicloEmail) {
-                                println("Vamos criar um usuario comum então")
+                                println("Vamos criar um usuário comum então")
                                 println(lineBar)
                                 print("\nDigite seu email: ")
                                 val inputEmail = readln().trim()
-                                // Verificação de formato correto do email, criterio: Conter o @ e 5 ou mais caracteres
+                                // Verificação de formato correto do email, critério: Conter o @ e 5 ou mais caracteres
                                 if (inputEmail.contains("@") && inputEmail.length >= 5) {
-                                    // Variaveis para verificação de duplicidade de email nos usuarios comuns e organizadores
+                                    // Variáveis para verificação de duplicidade de email nos usuários comuns e organizadores
                                     val verificarDuplicidadeEmailUsuarioComum =
                                         listaUsuarios.any { it.email == inputEmail }
                                     val verificarDuplicidadeEmailOrganizador =
                                         listaOrganizadores.any { it.email == inputEmail }
-                                    // Condicional Verifdicando emails duplicados
+                                    // Condicional Verificando emails duplicados
                                     if (verificarDuplicidadeEmailUsuarioComum || verificarDuplicidadeEmailOrganizador) {
-                                        println(COR.VERMELHO + "ERRO: " + COR.AMARELO + " Email informado ja cadastrado, por favor efetui o login ou utilize um email diferente" + COR.RESET)
+                                        println(COR.VERMELHO + "ERRO: " + COR.AMARELO + " Email informado ja cadastrado, por favor efetue o login ou utilize um email diferente" + COR.RESET)
                                     } else {
                                         println(COR.VERDE + "E-mail válido e disponível. Prosseguindo..." + COR.RESET)
                                         email = inputEmail
@@ -1005,7 +1016,7 @@ fun main() {
                                 }
                             }
                             println(COR.VERDE + "Gênero cadastrado com sucesso! Prosseguindo..." + COR.RESET)
-                            while (cicloDataNacimento) {
+                            while (cicloDataNascimento) {
                                 println(lineBar)
                                 val hoje = LocalDate.now()
 
@@ -1033,10 +1044,10 @@ fun main() {
                                         val idadeCalculada = Period.between(dataConvertida, hoje).years
                                         println(COR.AMARELO + "Sua idade atual: $idadeCalculada anos." + COR.RESET)
                                     }else {
-                                        // Se for bem sucessido
+                                        // Se for bem-sucedido
                                         dataNascimento = dataConvertida
                                         println(COR.VERDE + "Data de nascimento valida! Idade Confirmada" + COR.RESET)
-                                        cicloDataNacimento = false
+                                        cicloDataNascimento = false
                                     }
 
                                 }catch (e: Exception) {
@@ -1052,7 +1063,7 @@ fun main() {
                                 cicloNome = true
                                 cicloEmail = true
                                 cicloSenha = true
-                                cicloDataNacimento = true
+                                cicloDataNascimento = true
                             } else {
                                 try {
                                     listaUsuarios.add(UsuarioComum(nome, dataNascimento, sexo, email, senha))
@@ -1073,9 +1084,9 @@ fun main() {
                         var cicloEmail = true
                         var cicloSenha = true
                         var cicloNome = true
-                        var cicloDataNacimento = true
+                        var cicloDataNascimento = true
 
-                        // variaveis para armazenar os dados do organizador de forma segura
+                        // variáveis para armazenar os dados do organizador de forma segura
                         var nome = ""
                         var email = ""
                         var senha = ""
@@ -1083,7 +1094,7 @@ fun main() {
                         var sexo : Sexo = Sexo.OUTROS
                         val ativo: Boolean = true
 
-                        // Dados opicionais da empresa
+                        // Dados opcionais da empresa
                         var cnpj: String? = null
                         var razaoSocial: String? = null
                         var nomeFantasia: String? = null
@@ -1093,20 +1104,20 @@ fun main() {
 
                         while (cicloCriarOrganizador) {
                             while (cicloEmail) {
-                                println("Vamos criar um usuario organizador então")
+                                println("Vamos criar um usuário organizador então")
                                 println(lineBar)
                                 print("\nDigite seu email: ")
                                 val inputEmail = readln().trim()
-                                // Verificação de formato correto do email, criterio: Conter o @ e 5 ou mais caracteres
+                                // Verificação de formato correto do email, critério: Conter o @ e 5 ou mais caracteres
                                 if (inputEmail.contains("@") && inputEmail.length >= 5) {
-                                    // Variaveis para verificação de duplicidade de email nos usuarios comuns e organizadores
+                                    // Variáveis para verificação de duplicidade de email nos usuários comuns e organizadores
                                     val verificarDuplicidadeEmailUsuarioComum =
                                         listaUsuarios.any { it.email == inputEmail }
                                     val verificarDuplicidadeEmailOrganizador =
                                         listaOrganizadores.any { it.email == inputEmail }
-                                    // Condicional Verifdicando emails duplicados
+                                    // Condicional Verificando emails duplicados
                                     if (verificarDuplicidadeEmailUsuarioComum || verificarDuplicidadeEmailOrganizador) {
-                                        println(COR.VERMELHO + "ERRO: " + COR.AMARELO + " Email informado ja cadastrado, por favor efetui o login ou utilize um email diferente" + COR.RESET)
+                                        println(COR.VERMELHO + "ERRO: " + COR.AMARELO + " Email informado ja cadastrado, por favor efetue o login ou utilize um email diferente" + COR.RESET)
                                     } else {
                                         println(COR.VERDE + "E-mail válido e disponível. Prosseguindo..." + COR.RESET)
                                         email = inputEmail
@@ -1167,7 +1178,7 @@ fun main() {
                                 }
                             }
                             println(COR.VERDE + "Gênero cadastrado com sucesso! Prosseguindo..." + COR.RESET)
-                            while (cicloDataNacimento) {
+                            while (cicloDataNascimento) {
                                 println(lineBar)
                                 val hoje = LocalDate.now()
 
@@ -1195,10 +1206,10 @@ fun main() {
                                         val idadeCalculada = Period.between(dataConvertida, hoje).years
                                         println(COR.AMARELO + "Sua idade atual: $idadeCalculada anos." + COR.RESET)
                                     }else {
-                                        // Se for bem sucessido
+                                        // Se for bem-sucedido
                                         dataNascimento = dataConvertida
                                         println(COR.VERDE + "Data de nascimento valida! Idade Confirmada" + COR.RESET)
-                                        cicloDataNacimento = false
+                                        cicloDataNascimento = false
                                     }
 
                                 }catch (e: Exception) {
@@ -1211,7 +1222,7 @@ fun main() {
                             var cadastrarEmpresa = true
                             while (cadastrarEmpresa) {
                                 println(lineBar)
-                                println("Você representa uma Empresa/Intituição?")
+                                println("Você representa uma Empresa/Instituição?")
                                 println("1) Sim (Sou Pessoa Jurídica)")
                                 println("2) Não (Sou Pessoa Física")
                                 print("Opção: ")
@@ -1246,7 +1257,7 @@ fun main() {
                                 cicloNome = true
                                 cicloEmail = true
                                 cicloSenha = true
-                                cicloDataNacimento = true
+                                cicloDataNascimento = true
 
                                 cnpj = null
                                 razaoSocial = null
