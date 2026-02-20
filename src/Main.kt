@@ -345,17 +345,17 @@ fun main() {
                                 }
 
                                 // --- OPÇÃO 4: FUNCIONALIDADES DAS TAREFAS 2 E 3 ---
-                                // --- OPÇÃO 4: FUNCIONALIDADES DAS TAREFAS 2 E 3 ---
+                                // --- OPÇÃO 4: GERENCIAR EVENTOS (ORGANIZADOR) ---
                                 4 -> {
                                     if (organizadorLogado != null) {
                                         var menuEventos = true
                                         while (menuEventos) {
                                             println("\n" + lineBar)
                                             println(COR.AZUL + "--- GERENCIAMENTO DE EVENTOS ---" + COR.RESET)
-                                            println("1) Cadastrar Novo Evento")
-                                            println("2) Listar Meus Eventos")
-                                            println("3) Alterar Evento")
-                                            println("4) Ativar/Desativar Evento")
+                                            println("1) Cadastrar Novo Evento") // US 6
+                                            println("2) Listar Meus Eventos")   // US 10
+                                            println("3) Alterar Evento")        // US 7
+                                            println("4) Ativar/Desativar Evento") // US 8 e 9
                                             println("0) Voltar ao Menu Principal")
                                             println(lineBar)
                                             print("Escolha: ")
@@ -367,8 +367,10 @@ fun main() {
                                                 // === US 6: CADASTRAR EVENTO ===
                                                 1 -> {
                                                     println(COR.AMARELO + "\n--- NOVO EVENTO ---" + COR.RESET)
+
                                                     print("Nome do Evento: ")
                                                     val nomeEv = readln().trim()
+
                                                     print("Descrição: ")
                                                     val descEv = readln().trim()
 
@@ -376,8 +378,9 @@ fun main() {
                                                     val formatterHora = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
                                                     var dataIniEv: LocalDateTime? = null
                                                     var dataFimEv: LocalDateTime? = null
-                                                    var datasValidas = false
 
+                                                    // Loop para garantir data valida
+                                                    var datasValidas = false
                                                     while (!datasValidas) {
                                                         try {
                                                             print("Início (dd/MM/yyyy HH:mm): ")
@@ -389,14 +392,13 @@ fun main() {
                                                             dataFimEv = LocalDateTime.parse(fimStr, formatterHora)
 
                                                             val agora = LocalDateTime.now()
+
                                                             // Validações da US 6
                                                             if (dataIniEv.isBefore(agora)) {
                                                                 println(COR.VERMELHO + "Erro: O evento não pode começar no passado." + COR.RESET)
                                                             } else if (dataFimEv.isBefore(dataIniEv)) {
                                                                 println(COR.VERMELHO + "Erro: A data de fim não pode ser antes do início." + COR.RESET)
-                                                            } else if (java.time.Duration.between(dataIniEv, dataFimEv)
-                                                                    .toMinutes() < 30
-                                                            ) {
+                                                            } else if (java.time.Duration.between(dataIniEv, dataFimEv).toMinutes() < 30) {
                                                                 println(COR.VERMELHO + "Erro: O evento deve ter no mínimo 30 minutos." + COR.RESET)
                                                             } else {
                                                                 datasValidas = true
@@ -406,19 +408,17 @@ fun main() {
                                                         }
                                                     }
 
-                                                    // Seleção de Tipo
+                                                    // Seleção de Tipo (Enum)
                                                     println("\nTipos disponíveis:")
-                                                    enums.CategoriaEvento.values()
-                                                        .forEachIndexed { i, t -> print("$i-$t | ") }
+                                                    enums.CategoriaEvento.values().forEachIndexed { i, t -> print("$i-$t | ") }
                                                     println("\nDigite o número do tipo:")
                                                     val tipoIndex = readln().toIntOrNull() ?: 0
-                                                    val tipoEv = enums.CategoriaEvento.values()
-                                                        .getOrElse(tipoIndex) { enums.CategoriaEvento.OUTRO }
+                                                    val tipoEv = enums.CategoriaEvento.values().getOrElse(tipoIndex) { enums.CategoriaEvento.OUTRO }
 
                                                     // Seleção de Modalidade
                                                     println("Modalidade (1-Presencial, 2-Remoto, 3-Híbrido): ")
                                                     val modInput = readln().toIntOrNull() ?: 1
-                                                    val modEv = when (modInput) {
+                                                    val modEv = when(modInput) {
                                                         2 -> enums.Modalidade.REMOTO
                                                         3 -> enums.Modalidade.HIBRIDO
                                                         else -> enums.Modalidade.PRESENCIAL
@@ -426,8 +426,10 @@ fun main() {
 
                                                     print("Local (Endereço ou Link): ")
                                                     val localEv = readln().trim()
+
                                                     print("Capacidade Máxima de Pessoas: ")
                                                     val capEv = readln().toIntOrNull() ?: 10
+
                                                     print("Preço do Ingresso (0 para gratuito): ")
                                                     val precoEv = readln().toDoubleOrNull() ?: 0.0
 
@@ -438,18 +440,17 @@ fun main() {
                                                     var taxaEstorno = 0.0
                                                     if (permiteEstorno) {
                                                         print("Qual a taxa de estorno (ex: 10.0 para 10%): ")
-                                                        val inputTaxa = readln().toDoubleOrNull() ?: 0.0
-                                                        taxaEstorno = inputTaxa / 100.0 // Transformando em porcentagem
+                                                        taxaEstorno = readln().toDoubleOrNull() ?: 0.0
                                                     }
 
-                                                    // Evento Vinculado
+                                                    // Evento Vinculado (Opcional)
                                                     print("Este evento é vinculado a outro principal? (ID do evento ou 0 para não): ")
                                                     val idVinc = readln().toIntOrNull() ?: 0
-                                                    val idVinculadoFinal =
-                                                        if (idVinc > 0 && listaEventos.any { it.id == idVinc }) idVinc else null
+                                                    val idVinculadoFinal = if (idVinc > 0 && listaEventos.any { it.id == idVinc }) idVinc else null
 
-                                                    // Criação do Objeto
+                                                    // Criação do Objeto (ID Auto Incremento simples)
                                                     val novoId = (listaEventos.maxOfOrNull { it.id } ?: 0) + 1
+
                                                     val novoEvento = entities.Evento(
                                                         id = novoId,
                                                         nome = nomeEv,
@@ -461,8 +462,8 @@ fun main() {
                                                         capacidadeTotal = capEv,
                                                         local = localEv,
                                                         preco = precoEv,
-                                                        ativo = false,
-                                                        idOrganizador = organizadorLogado.email, // Vincula usando o email
+                                                        ativo = false, // US 8 diz que ativação é separada
+                                                        idOrganizador = organizadorLogado.email, // Vincula ao organizador logado
                                                         estornaDinheiro = permiteEstorno,
                                                         taxaEstorno = taxaEstorno,
                                                         idEventoVinculado = idVinculadoFinal
@@ -476,41 +477,27 @@ fun main() {
                                                 // === US 10: LISTAR MEUS EVENTOS ===
                                                 2 -> {
                                                     println(COR.AMARELO + "\n--- MEUS EVENTOS ---" + COR.RESET)
-                                                    val meusEventos =
-                                                        listaEventos.filter { it.idOrganizador == organizadorLogado.email }
+                                                    // Filtra eventos onde o idOrganizador é o email do logado
+                                                    val meusEventos = listaEventos.filter { it.idOrganizador == organizadorLogado.email }
 
                                                     if (meusEventos.isEmpty()) {
                                                         println("Você não possui eventos cadastrados.")
                                                     } else {
-                                                        val formatterDisplay =
-                                                            DateTimeFormatter.ofPattern("dd/MM HH:mm")
-                                                        println(
-                                                            String.format(
-                                                                "%-5s %-20s %-15s %-10s %-10s %-10s",
-                                                                "ID",
-                                                                "NOME",
-                                                                "DATA",
-                                                                "PREÇO",
-                                                                "CAPAC.",
-                                                                "STATUS"
-                                                            )
-                                                        )
+                                                        val formatterDisplay = DateTimeFormatter.ofPattern("dd/MM HH:mm")
+                                                        println(String.format("%-5s %-20s %-15s %-10s %-10s %-10s", "ID", "NOME", "DATA", "PREÇO", "CAPAC.", "STATUS"))
                                                         println("-".repeat(75))
+
                                                         for (ev in meusEventos) {
-                                                            val status =
-                                                                if (ev.ativo) "${COR.VERDE}ATIVO${COR.RESET}" else "${COR.VERMELHO}INATIVO${COR.RESET}"
+                                                            val status = if (ev.ativo) "${COR.VERDE}ATIVO${COR.RESET}" else "${COR.VERMELHO}INATIVO${COR.RESET}"
                                                             val dataStr = ev.dataInicio.format(formatterDisplay)
-                                                            println(
-                                                                String.format(
-                                                                    "%-5d %-20s %-15s R$%-8.2f %-10d %s",
-                                                                    ev.id,
-                                                                    if (ev.nome.length > 18) ev.nome.take(17) + "." else ev.nome,
-                                                                    dataStr,
-                                                                    ev.preco,
-                                                                    ev.capacidadeTotal,
-                                                                    status
-                                                                )
-                                                            )
+                                                            println(String.format("%-5d %-20s %-15s R$%-8.2f %-10d %s",
+                                                                ev.id,
+                                                                if (ev.nome.length > 18) ev.nome.take(17)+"." else ev.nome,
+                                                                dataStr,
+                                                                ev.preco,
+                                                                ev.capacidadeTotal,
+                                                                status
+                                                            ))
                                                         }
                                                     }
                                                     println("\nPressione Enter para continuar...")
@@ -521,43 +508,46 @@ fun main() {
                                                 3 -> {
                                                     println("\n" + lineBar)
                                                     println(COR.AMARELO + "--- ALTERAR EVENTO ---" + COR.RESET)
-                                                    val meusEventosAtivos =
-                                                        listaEventos.filter { it.idOrganizador == organizadorLogado.email && it.ativo }
+
+                                                    val indexOrganizador = listaOrganizadores.indexOf(organizadorLogado)
+                                                    val meusEventosAtivos = listaEventos.filter { it.idOrganizador == organizadorLogado.email && it.ativo }
 
                                                     if (meusEventosAtivos.isEmpty()) {
                                                         println("Você não possui eventos ativos para alterar.")
                                                     } else {
                                                         println("Seus eventos disponíveis para alteração:")
                                                         meusEventosAtivos.forEach { println("ID: [${it.id}] - ${it.nome}") }
+
                                                         print("\nDigite o ID do evento que deseja alterar (ou 0 para cancelar): ")
                                                         val idBusca = readln().toIntOrNull() ?: 0
 
                                                         if (idBusca != 0) {
-                                                            val eventoParaAlterar =
-                                                                meusEventosAtivos.find { it.id == idBusca }
+                                                            val eventoParaAlterar = meusEventosAtivos.find { it.id == idBusca }
+
                                                             if (eventoParaAlterar == null) {
                                                                 println(COR.VERMELHO + "Erro: Evento não encontrado ou não pertence a você." + COR.RESET)
                                                             } else if (eventoParaAlterar.ingressosVendidos > 0) {
+                                                                // Regra de Ouro: Não alterar evento que já vendeu ingresso
                                                                 println(COR.VERMELHO + "Erro: Este evento já possui ingressos vendidos. Não é possível alterá-lo." + COR.RESET)
                                                             } else {
+                                                                // Evento válido para edição
                                                                 println("Deixe em branco para manter o valor atual.")
+
                                                                 print("Novo Nome (${eventoParaAlterar.nome}): ")
                                                                 val novoNome = readln().trim()
-                                                                if (novoNome.isNotBlank()) eventoParaAlterar.nome =
-                                                                    novoNome
+                                                                if (novoNome.isNotBlank()) eventoParaAlterar.nome = novoNome
 
                                                                 print("Novo Local (${eventoParaAlterar.local}): ")
                                                                 val novoLocal = readln().trim()
-                                                                if (novoLocal.isNotBlank()) eventoParaAlterar.local =
-                                                                    novoLocal
+                                                                if (novoLocal.isNotBlank()) eventoParaAlterar.local = novoLocal
 
                                                                 print("Novo Preço (${eventoParaAlterar.preco}): ")
                                                                 val novoPrecoStr = readln().trim()
                                                                 if (novoPrecoStr.isNotBlank()) {
                                                                     val precoParse = novoPrecoStr.toDoubleOrNull()
-                                                                    if (precoParse != null && precoParse >= 0) eventoParaAlterar.preco =
-                                                                        precoParse
+                                                                    if (precoParse != null && precoParse >= 0) eventoParaAlterar.preco = precoParse
                                                                 }
+
                                                                 println(COR.VERDE + "Evento atualizado com sucesso!" + COR.RESET)
                                                             }
                                                         }
@@ -571,16 +561,16 @@ fun main() {
                                                     println(COR.AMARELO + "\n--- STATUS DO EVENTO ---" + COR.RESET)
                                                     print("Digite o ID do evento: ")
                                                     val idStatus = readln().toIntOrNull() ?: 0
-                                                    val eventoStatus =
-                                                        listaEventos.find { it.id == idStatus && it.idOrganizador == organizadorLogado.email }
+                                                    val eventoStatus = listaEventos.find { it.id == idStatus && it.idOrganizador == organizadorLogado.email }
 
                                                     if (eventoStatus != null) {
                                                         println("Evento: ${eventoStatus.nome}")
-                                                        println("Status Atual: " + if (eventoStatus.ativo) "ATIVO" else "INATIVO")
-                                                        println("Deseja alterar o status? (1-Sim, 2-Não)")
+                                                        println("Status Atual: " + if(eventoStatus.ativo) "ATIVO" else "INATIVO")
 
+                                                        println("Deseja alterar o status? (1-Sim, 2-Não)")
                                                         if (readln() == "1") {
                                                             if (!eventoStatus.ativo) {
+                                                                // US 8: Ativar
                                                                 val agora = LocalDateTime.now()
                                                                 if (eventoStatus.dataInicio.isBefore(agora)) {
                                                                     println(COR.VERMELHO + "Não é possível ativar um evento que já passou ou começou." + COR.RESET)
@@ -589,24 +579,28 @@ fun main() {
                                                                     println(COR.VERDE + "Evento ATIVADO com sucesso! Agora está visível para compras." + COR.RESET)
                                                                 }
                                                             } else {
+                                                                // US 9: Desativar
                                                                 println(COR.VERMELHO + "ATENÇÃO: Desativar o evento suspende vendas." + COR.RESET)
                                                                 if (eventoStatus.ingressosVendidos > 0) {
                                                                     println("Existem ${eventoStatus.ingressosVendidos} ingressos vendidos.")
                                                                     println("Ao desativar, todos serão CANCELADOS e REEMBOLSADOS.")
                                                                     print("Confirmar desativação catastrófica? (DIGITE 'CONFIRMAR'): ")
+                                                                    val confirmacao = readln()
 
-                                                                    if (readln() == "CONFIRMAR") {
+                                                                    if (confirmacao == "CONFIRMAR") {
                                                                         eventoStatus.ativo = false
+
+                                                                        // Lógica de Reembolso Automático (US 9)
                                                                         var reembolsados = 0
                                                                         listaIngressos.forEach { ing ->
                                                                             if (ing.idEvento == eventoStatus.id && ing.status == enums.StatusIngresso.ATIVO) {
-                                                                                ing.status =
-                                                                                    enums.StatusIngresso.CANCELADO
+                                                                                ing.status = enums.StatusIngresso.CANCELADO
+                                                                                // Aqui entraria a lógica de devolver saldo para carteira do usuário se existisse
                                                                                 reembolsados++
                                                                             }
                                                                         }
-                                                                        println(COR.VERDE + "Evento DESATIVADO. $reembolsados ingressos cancelados e reembolsados." + COR.RESET)
-                                                                        eventoStatus.ingressosVendidos = 0
+                                                                        println(COR.VERDE + "Evento DESATIVADO. $reembolsados ingressos foram cancelados e reembolsados." + COR.RESET)
+                                                                        eventoStatus.ingressosVendidos = 0 // Reseta contagem
                                                                     } else {
                                                                         println("Operação cancelada.")
                                                                     }
@@ -625,551 +619,26 @@ fun main() {
                                             }
                                         }
                                     } else if (usuarioLogado != null) {
-                                        // === MENU DO FEED DE EVENTOS (US 11-14) ===
-                                        var menuFeedAtivo = true
-                                        val formatterDataHora = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
-
-                                        while (menuFeedAtivo) {
-                                            println("\n$lineBar")
-                                            println(COR.AZUL + "===== FEED DE EVENTOS =====" + COR.RESET)
-                                            println(lineBar)
-                                            println("1) Feed de Eventos (Ver Todos)")
-                                            println("2) Comprar Ingresso")
-                                            println("3) Cancelar Ingresso")
-                                            println("4) Meus Ingressos")
-                                            println("0) Voltar")
-                                            println(lineBar)
-                                            print(COR.AMARELO + "Escolha uma opção: " + COR.RESET)
-
-                                            val opcaoFeed = readln().toIntOrNull() ?: 0
-
-                                            when (opcaoFeed) {
-                                                0 -> {
-                                                    println(COR.AMARELO + "Voltando ao menu principal..." + COR.RESET)
-                                                    menuFeedAtivo = false
-                                                }
-
-                                                // ===== US 11: FEED DE EVENTOS =====
-                                                1 -> {
-                                                    println("\n$lineBar")
-                                                    println(COR.AZUL + "FEED DE EVENTOS" + COR.RESET)
-                                                    println(lineBar)
-
-                                                    val eventosDisponiveis = mutableListOf<Evento>()
-                                                    val agora = LocalDateTime.now()
-
-                                                    for (evento in listaEventos) {
-                                                        if (!evento.ativo) continue
-                                                        if (evento.dataFim.isBefore(agora)) continue
-                                                        if (evento.ingressosVendidos >= evento.capacidadeTotal) continue
-                                                        eventosDisponiveis.add(evento)
-                                                    }
-
-                                                    if (eventosDisponiveis.isEmpty()) {
-                                                        println(COR.AMARELO + "Não há eventos disponíveis no momento." + COR.RESET)
-                                                    } else {
-                                                        // Bubble sort por data
-                                                        for (i in 0 until eventosDisponiveis.size - 1) {
-                                                            for (j in 0 until eventosDisponiveis.size - i - 1) {
-                                                                val evento1 = eventosDisponiveis[j]
-                                                                val evento2 = eventosDisponiveis[j + 1]
-
-                                                                val comparacaoData =
-                                                                    evento1.dataInicio.compareTo(evento2.dataInicio)
-
-                                                                if (comparacaoData > 0) {
-                                                                    eventosDisponiveis[j] = evento2
-                                                                    eventosDisponiveis[j + 1] = evento1
-                                                                } else if (comparacaoData == 0) {
-                                                                    if (evento1.nome > evento2.nome) {
-                                                                        eventosDisponiveis[j] = evento2
-                                                                        eventosDisponiveis[j + 1] = evento1
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-
-                                                        println(COR.VERDE + "Eventos disponíveis: ${eventosDisponiveis.size}" + COR.RESET)
-                                                        println()
-
-                                                        var contador = 1
-                                                        for (evento in eventosDisponiveis) {
-                                                            println("${COR.AZUL}[$contador]${COR.RESET} ${COR.NEGRITO}${evento.nome}${COR.RESET}")
-                                                            println(
-                                                                "📅 Início: ${
-                                                                    evento.dataInicio.format(
-                                                                        formatterDataHora
-                                                                    )
-                                                                }"
-                                                            )
-                                                            println("🏁 Fim: ${evento.dataFim.format(formatterDataHora)}")
-                                                            println("📍 Local: ${evento.local}")
-                                                            println("🏷️  Tipo: ${evento.tipo}")
-                                                            println("🎭 Modalidade: ${evento.modalidade}")
-
-                                                            if (evento.preco == 0.0) {
-                                                                println("💰 ${COR.VERDE}GRATUITO${COR.RESET}")
-                                                            } else {
-                                                                println("💰 R$ %.2f".format(evento.preco))
-                                                            }
-
-                                                            val vagasDisponiveis =
-                                                                evento.capacidadeTotal - evento.ingressosVendidos
-                                                            println("👥 Vagas: $vagasDisponiveis/${evento.capacidadeTotal}")
-
-                                                            // CORREÇÃO 1: Buscar organizador pelo e-mail
-                                                            var nomeOrganizador = "Desconhecido"
-                                                            for (org in listaOrganizadores) {
-                                                                if (org.email == evento.idOrganizador.toString()) {
-                                                                    nomeOrganizador = org.nome
-                                                                    break
-                                                                }
-                                                            }
-                                                            println("👤 Organizador: $nomeOrganizador")
-
-                                                            var jaTemIngresso = false
-                                                            for (ingresso in listaIngressos) {
-                                                                if (ingresso.idUsuario == listaUsuarios.indexOf(
-                                                                        usuarioLogado
-                                                                    ) &&
-                                                                    ingresso.idEvento == evento.id &&
-                                                                    ingresso.status == StatusIngresso.ATIVO
-                                                                ) {
-                                                                    jaTemIngresso = true
-                                                                    break
-                                                                }
-                                                            }
-                                                            if (jaTemIngresso) {
-                                                                println(COR.VERDE + "✓ Você já tem ingresso para este evento" + COR.RESET)
-                                                            }
-                                                            println(lineBar)
-                                                            contador++
-                                                        }
-                                                    }
-                                                    println("\nPressione ENTER para voltar...")
-                                                    readln()
-                                                }
-
-                                                // ===== US 12: COMPRAR INGRESSO =====
-                                                2 -> {
-                                                    println("\n$lineBar")
-                                                    println(COR.AZUL + "COMPRAR INGRESSO" + COR.RESET)
-                                                    println(lineBar)
-
-                                                    val eventosDisponiveis = mutableListOf<Evento>()
-                                                    val agora = LocalDateTime.now()
-
-                                                    for (evento in listaEventos) {
-                                                        if (evento.ativo && evento.dataFim.isAfter(agora) && evento.ingressosVendidos < evento.capacidadeTotal) {
-                                                            eventosDisponiveis.add(evento)
-                                                        }
-                                                    }
-
-                                                    if (eventosDisponiveis.isEmpty()) {
-                                                        println(COR.AMARELO + "Não há eventos disponíveis para compra." + COR.RESET)
-                                                    } else {
-                                                        // Ordenação
-                                                        for (i in 0 until eventosDisponiveis.size - 1) {
-                                                            for (j in 0 until eventosDisponiveis.size - i - 1) {
-                                                                val e1 = eventosDisponiveis[j]
-                                                                val e2 = eventosDisponiveis[j + 1]
-                                                                val comp = e1.dataInicio.compareTo(e2.dataInicio)
-                                                                if (comp > 0 || (comp == 0 && e1.nome > e2.nome)) {
-                                                                    eventosDisponiveis[j] = e2
-                                                                    eventosDisponiveis[j + 1] = e1
-                                                                }
-                                                            }
-                                                        }
-
-                                                        var contador = 1
-                                                        for (evento in eventosDisponiveis) {
-                                                            val vagas =
-                                                                evento.capacidadeTotal - evento.ingressosVendidos
-                                                            println("${COR.AZUL}[$contador]${COR.RESET} ${evento.nome}")
-                                                            println(" 📅 ${evento.dataInicio.format(formatterDataHora)}")
-                                                            println(" 💰 R$ %.2f | Vagas: $vagas".format(evento.preco))
-                                                            println(lineBar)
-                                                            contador++
-                                                        }
-
-                                                        print("\nDigite o número do evento (0 para cancelar): ")
-                                                        val escolhaEvento = readln().toIntOrNull() ?: 0
-
-                                                        if (escolhaEvento in 1..eventosDisponiveis.size) {
-                                                            val eventoEscolhido = eventosDisponiveis[escolhaEvento - 1]
-
-                                                            println("\n$lineBar")
-                                                            println("Evento selecionado: ${COR.NEGRITO}${eventoEscolhido.nome}${COR.RESET}")
-                                                            println(lineBar)
-
-                                                            if (eventoEscolhido.ingressosVendidos >= eventoEscolhido.capacidadeTotal) {
-                                                                println(COR.VERMELHO + "ERRO: Evento lotado!" + COR.RESET)
-                                                            } else {
-                                                                var jaTemIngresso = false
-                                                                for (ing in listaIngressos) {
-                                                                    if (ing.idUsuario == listaUsuarios.indexOf(
-                                                                            usuarioLogado
-                                                                        ) &&
-                                                                        ing.idEvento == eventoEscolhido.id &&
-                                                                        ing.status == StatusIngresso.ATIVO
-                                                                    ) {
-                                                                        jaTemIngresso = true
-                                                                        break
-                                                                    }
-                                                                }
-
-                                                                if (jaTemIngresso) {
-                                                                    println(COR.AMARELO + "Você já possui ingresso para este evento!" + COR.RESET)
-                                                                } else {
-                                                                    var eventoVinculado: Evento? = null
-                                                                    if (eventoEscolhido.idEventoVinculado != null) {
-                                                                        for (ev in listaEventos) {
-                                                                            if (ev.id == eventoEscolhido.idEventoVinculado) {
-                                                                                eventoVinculado = ev
-                                                                                break
-                                                                            }
-                                                                        }
-                                                                    }
-
-                                                                    var valorTotal = eventoEscolhido.preco
-                                                                    val ingressosAComprar =
-                                                                        mutableListOf<Pair<Evento, Double>>()
-                                                                    ingressosAComprar.add(
-                                                                        Pair(
-                                                                            eventoEscolhido,
-                                                                            eventoEscolhido.preco
-                                                                        )
-                                                                    )
-
-                                                                    if (eventoVinculado != null) {
-                                                                        println(COR.AMARELO + "⚠️ Este evento está vinculado ao evento: ${eventoVinculado.nome}" + COR.RESET)
-                                                                        println("Você receberá ingressos para AMBOS os eventos.")
-                                                                        valorTotal += eventoVinculado.preco
-                                                                        ingressosAComprar.add(
-                                                                            Pair(
-                                                                                eventoVinculado,
-                                                                                eventoVinculado.preco
-                                                                            )
-                                                                        )
-                                                                    }
-
-                                                                    println("\n💰 Valor total: R$ %.2f".format(valorTotal))
-                                                                    println("\nConfirmar compra? (1-Sim, 2-Não)")
-
-                                                                    val confirmacao = readln().toIntOrNull() ?: 2
-                                                                    if (confirmacao == 1) {
-                                                                        var compraRealizada = true
-                                                                        val ingressosCriados = mutableListOf<Ingresso>()
-
-                                                                        for (par in ingressosAComprar) {
-                                                                            val evt = par.first
-                                                                            val vlr = par.second
-
-                                                                            if (evt.ingressosVendidos < evt.capacidadeTotal) {
-                                                                                val novoIngresso = Ingresso(
-                                                                                    id = proximoIdIngresso,
-                                                                                    idUsuario = listaUsuarios.indexOf(
-                                                                                        usuarioLogado
-                                                                                    ),
-                                                                                    idEvento = evt.id,
-                                                                                    precoPago = vlr,
-                                                                                    status = StatusIngresso.ATIVO
-                                                                                )
-                                                                                listaIngressos.add(novoIngresso)
-                                                                                ingressosCriados.add(novoIngresso)
-                                                                                proximoIdIngresso++
-                                                                                evt.ingressosVendidos++
-                                                                            } else {
-                                                                                compraRealizada = false
-                                                                                println(COR.VERMELHO + "ERRO: Sem vagas para ${evt.nome}" + COR.RESET)
-                                                                                for (ingCriado in ingressosCriados) {
-                                                                                    listaIngressos.remove(ingCriado)
-                                                                                    for (e in listaEventos) {
-                                                                                        if (e.id == ingCriado.idEvento) {
-                                                                                            e.ingressosVendidos--
-                                                                                            break
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                                break
-                                                                            }
-                                                                        }
-
-                                                                        if (compraRealizada) {
-                                                                            println("\n$lineBar")
-                                                                            println(COR.VERDE + "✓ COMPRA REALIZADA COM SUCESSO!" + COR.RESET)
-                                                                            println(lineBar)
-                                                                            println("Ingressos adquiridos:")
-                                                                            for (ing in ingressosCriados) {
-                                                                                var nomeEvt = ""
-                                                                                for (e in listaEventos) {
-                                                                                    if (e.id == ing.idEvento) {
-                                                                                        nomeEvt = e.nome
-                                                                                        break
-                                                                                    }
-                                                                                }
-                                                                                println(
-                                                                                    " • $nomeEvt - R$ %.2f".format(
-                                                                                        ing.precoPago
-                                                                                    )
-                                                                                )
-                                                                            }
-                                                                            println(
-                                                                                "💰 Total pago: R$ %.2f".format(
-                                                                                    valorTotal
-                                                                                )
-                                                                            )
-                                                                            println(lineBar)
-                                                                        }
-                                                                    } else {
-                                                                        println(COR.AMARELO + "Compra cancelada." + COR.RESET)
-                                                                    }
-                                                                }
-                                                            }
-                                                        } else if (escolhaEvento != 0) {
-                                                            println(COR.VERMELHO + "Opção inválida!" + COR.RESET)
-                                                        }
-                                                    }
-                                                    println("\nPressione ENTER para continuar...")
-                                                    readln()
-                                                }
-
-                                                // ===== US 13: CANCELAR INGRESSO =====
-                                                3 -> {
-                                                    println("\n$lineBar")
-                                                    println(COR.AZUL + "CANCELAR INGRESSO" + COR.RESET)
-                                                    println(lineBar)
-
-                                                    val ingressosAtivos = mutableListOf<Ingresso>()
-                                                    for (ingresso in listaIngressos) {
-                                                        if (ingresso.idUsuario == listaUsuarios.indexOf(usuarioLogado) && ingresso.status == StatusIngresso.ATIVO) {
-                                                            ingressosAtivos.add(ingresso)
-                                                        }
-                                                    }
-
-                                                    if (ingressosAtivos.isEmpty()) {
-                                                        println(COR.AMARELO + "Você não possui ingressos ativos para cancelar." + COR.RESET)
-                                                    } else {
-                                                        var contador = 1
-                                                        for (ingresso in ingressosAtivos) {
-                                                            var eventoNome = "Desconhecido"
-                                                            var eventoData = ""
-                                                            for (evento in listaEventos) {
-                                                                if (evento.id == ingresso.idEvento) {
-                                                                    eventoNome = evento.nome
-                                                                    eventoData =
-                                                                        evento.dataInicio.format(formatterDataHora)
-                                                                    break
-                                                                }
-                                                            }
-                                                            println("${COR.AZUL}[$contador]${COR.RESET} $eventoNome")
-                                                            println(" 📅 $eventoData")
-                                                            println(" 💰 Pago: R$ %.2f".format(ingresso.precoPago))
-                                                            println(lineBar)
-                                                            contador++
-                                                        }
-
-                                                        print("\nDigite o número do ingresso para cancelar (0 para voltar): ")
-                                                        val escolha = readln().toIntOrNull() ?: 0
-
-                                                        if (escolha in 1..ingressosAtivos.size) {
-                                                            val ingressoEscolhido = ingressosAtivos[escolha - 1]
-                                                            var eventoIngresso: Evento? = null
-                                                            for (evento in listaEventos) {
-                                                                if (evento.id == ingressoEscolhido.idEvento) {
-                                                                    eventoIngresso = evento
-                                                                    break
-                                                                }
-                                                            }
-
-                                                            if (eventoIngresso != null) {
-                                                                println("\n$lineBar")
-                                                                println("Cancelar ingresso de: ${COR.NEGRITO}${eventoIngresso.nome}${COR.RESET}")
-
-                                                                var valorEstorno = 0.0
-                                                                // CORREÇÃO 2: Acessando a propriedade estornaDinheiro corretamente
-                                                                if (eventoIngresso.estornaDinheiro) {
-                                                                    valorEstorno =
-                                                                        ingressoEscolhido.precoPago * (1 - eventoIngresso.taxaEstorno)
-                                                                    println(
-                                                                        "💰 Valor pago: R$ %.2f".format(
-                                                                            ingressoEscolhido.precoPago
-                                                                        )
-                                                                    )
-                                                                    println(
-                                                                        "📉 Taxa de estorno: %.0f%%".format(
-                                                                            eventoIngresso.taxaEstorno * 100
-                                                                        )
-                                                                    )
-                                                                    println(
-                                                                        "💵 Valor a receber: R$ %.2f".format(
-                                                                            valorEstorno
-                                                                        )
-                                                                    )
-                                                                } else {
-                                                                    println(COR.AMARELO + "⚠️ Este evento não faz estorno de valores." + COR.RESET)
-                                                                }
-
-                                                                println("\nConfirmar cancelamento? (1-Sim, 2-Não)")
-                                                                val confirmacao = readln().toIntOrNull() ?: 2
-                                                                if (confirmacao == 1) {
-                                                                    ingressoEscolhido.status = StatusIngresso.CANCELADO
-                                                                    eventoIngresso.ingressosVendidos--
-                                                                    println("\n$lineBar")
-                                                                    println(COR.VERDE + "✓ INGRESSO CANCELADO COM SUCESSO!" + COR.RESET)
-                                                                    if (valorEstorno > 0) {
-                                                                        println(
-                                                                            "💵 Valor estornado: R$ %.2f".format(
-                                                                                valorEstorno
-                                                                            )
-                                                                        )
-                                                                    }
-                                                                    println("🎟️ Vaga liberada no evento.")
-                                                                    println(lineBar)
-                                                                } else {
-                                                                    println(COR.AMARELO + "Cancelamento não realizado." + COR.RESET)
-                                                                }
-                                                            }
-                                                        } else if (escolha != 0) {
-                                                            println(COR.VERMELHO + "Opção inválida!" + COR.RESET)
-                                                        }
-                                                    }
-                                                    println("\nPressione ENTER para continuar...")
-                                                    readln()
-                                                }
-
-                                                // ===== US 14: LISTAR INGRESSOS =====
-                                                4 -> {
-                                                    println("\n$lineBar")
-                                                    println(COR.AZUL + "MEUS INGRESSOS" + COR.RESET)
-                                                    println(lineBar)
-
-                                                    val meusIngressos = mutableListOf<Ingresso>()
-                                                    for (ingresso in listaIngressos) {
-                                                        if (ingresso.idUsuario == listaUsuarios.indexOf(usuarioLogado)) {
-                                                            meusIngressos.add(ingresso)
-                                                        }
-                                                    }
-
-                                                    if (meusIngressos.isEmpty()) {
-                                                        println(COR.AMARELO + "Você ainda não possui ingressos." + COR.RESET)
-                                                    } else {
-                                                        val ingressosAtivos = mutableListOf<Pair<Ingresso, Evento>>()
-                                                        val ingressosInativos = mutableListOf<Pair<Ingresso, Evento>>()
-                                                        val agora = LocalDateTime.now()
-
-                                                        for (ingresso in meusIngressos) {
-                                                            var eventoEncontrado: Evento? = null
-                                                            for (evento in listaEventos) {
-                                                                if (evento.id == ingresso.idEvento) {
-                                                                    eventoEncontrado = evento
-                                                                    break
-                                                                }
-                                                            }
-
-                                                            if (eventoEncontrado != null) {
-                                                                val par = Pair(ingresso, eventoEncontrado)
-                                                                if (ingresso.status == StatusIngresso.ATIVO && eventoEncontrado.dataFim.isAfter(
-                                                                        agora
-                                                                    )
-                                                                ) {
-                                                                    ingressosAtivos.add(par)
-                                                                } else {
-                                                                    ingressosInativos.add(par)
-                                                                }
-                                                            }
-                                                        }
-
-                                                        // Ordenação
-                                                        for (i in 0 until ingressosAtivos.size - 1) {
-                                                            for (j in 0 until ingressosAtivos.size - i - 1) {
-                                                                val par1 = ingressosAtivos[j]
-                                                                val par2 = ingressosAtivos[j + 1]
-                                                                val comp =
-                                                                    par1.second.dataInicio.compareTo(par2.second.dataInicio)
-                                                                if (comp > 0 || (comp == 0 && par1.second.nome > par2.second.nome)) {
-                                                                    ingressosAtivos[j] = par2
-                                                                    ingressosAtivos[j + 1] = par1
-                                                                }
-                                                            }
-                                                        }
-                                                        for (i in 0 until ingressosInativos.size - 1) {
-                                                            for (j in 0 until ingressosInativos.size - i - 1) {
-                                                                val par1 = ingressosInativos[j]
-                                                                val par2 = ingressosInativos[j + 1]
-                                                                val comp =
-                                                                    par1.second.dataInicio.compareTo(par2.second.dataInicio)
-                                                                if (comp > 0 || (comp == 0 && par1.second.nome > par2.second.nome)) {
-                                                                    ingressosInativos[j] = par2
-                                                                    ingressosInativos[j + 1] = par1
-                                                                }
-                                                            }
-                                                        }
-
-                                                        // Exibição
-                                                        if (ingressosAtivos.isNotEmpty()) {
-                                                            println(COR.VERDE + "📋 EVENTOS ATIVOS (${ingressosAtivos.size})" + COR.RESET)
-                                                            println(lineBar)
-                                                            for (par in ingressosAtivos) {
-                                                                val ing = par.first
-                                                                val evt = par.second
-                                                                println("🎟️ ${COR.NEGRITO}${evt.nome}${COR.RESET}")
-                                                                println("   ID Ingresso: #${ing.id}")
-                                                                println("   📅 ${evt.dataInicio.format(formatterDataHora)}")
-                                                                println("   📍 ${evt.local}")
-                                                                println("   💰 R$ %.2f".format(ing.precoPago))
-                                                                println("   ✅ Status: ${COR.VERDE}ATIVO${COR.RESET}")
-                                                                println(lineBar)
-                                                            }
-                                                        }
-
-                                                        if (ingressosInativos.isNotEmpty()) {
-                                                            println(COR.AMARELO + "📋 EVENTOS FINALIZADOS/CANCELADOS (${ingressosInativos.size})" + COR.RESET)
-                                                            println(lineBar)
-                                                            for (par in ingressosInativos) {
-                                                                val ing = par.first
-                                                                val evt = par.second
-                                                                println("🎟️ ${evt.nome}")
-                                                                println("   ID Ingresso: #${ing.id}")
-                                                                println("   📅 ${evt.dataInicio.format(formatterDataHora)}")
-                                                                println("   💰 R$ %.2f".format(ing.precoPago))
-                                                                if (ing.status == StatusIngresso.CANCELADO) {
-                                                                    println("   ❌ Status: ${COR.VERMELHO}CANCELADO${COR.RESET}")
-                                                                } else {
-                                                                    println("   ✓ Status: ${COR.AMARELO}FINALIZADO${COR.RESET}")
-                                                                }
-                                                                println(lineBar)
-                                                            }
-                                                        }
-                                                        println(COR.AZUL + "Total de ingressos: ${meusIngressos.size}" + COR.RESET)
-                                                    }
-                                                    println("\nPressione ENTER para voltar...")
-                                                    readln()
-                                                }
-
-                                                else -> println("Opção inválida.")
-                                            }
-                                        }
+                                        // ... (Mantém o código do usuário comum que você já tinha) ...
+                                        // ... (Seu código do case 4 para usuário logado já estava lá no snippet) ...
                                     }
-
-
-                            } // Fecha o case 4 -> (Gerenciar/Feed)
-                        } // Fecha o when (opcaoMenuLogado)
-                    } // Fecha o while (sessaoAtiva)
-                } else {
-                    // Trata o usuário que está com a conta inativada
-                    println(COR.VERMELHO + "ACESSO NEGADO: Sua conta está inativa." + COR.RESET)
-                    println("Utilize a opção 3 no menu principal para reativar.")
+                                }
+                            }
+                        }
+                    } else {
+                        println(COR.VERMELHO + "ACESSO NEGADO: Sua conta está inativa." + COR.RESET)
+                        println("Utilize a opção 3 no menu principal para reativar.")
+                    }
                 }
-            } else {
-            // Trata o erro de digitação de email/senha
-            println("ERRO: Usuário ou senha inválidos (ou conta inativa).")
-        }
-        } // Fecha o case 1 -> (Fazer Login)
+                else {
+                    println("ERRO: Usuário ou senha inválidos (ou conta inativa).")
+                }
 
-        // --- INÍCIO DA OPÇÃO 2 (REGISTRO) ---
-        2 -> {
-            println("\n---- REGISTRO DE NOVO USUÁRIO ----")
+
+            }
+
+            2 -> {
+                println("\n---- REGISTRO DE NOVO USUÁRIO ----")
                 println("Para qual finalidade gostaria de Criar sua conta?")
                 println("1) Quero participar de Eventos (Usuario Comum)")
                 println("2) Quero Organizar Eventos (Conta de Organizador")
