@@ -22,5 +22,6 @@ enum class CategoriaEvento(val descricao: String) {
     CULTO("Culto"),
     CELEBRACAO("Celebração"),
     CAMPEONATO("Campeonato"),
+    OUTRO("Outro"),
     CORRIDA("Corrida");
 }

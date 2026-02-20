@@ -6,20 +6,19 @@ import java.time.LocalDateTime
 
 data class Evento(
     val id: Int,
-    val idOrganizador: Int,
-    var paginaEvento: String,
     var nome: String,
     var descricao: String,
     var dataInicio: LocalDateTime,
     var dataFim: LocalDateTime,
     var tipo: CategoriaEvento,
-    var idEventoVinculado: Int? = null,
     var modalidade: Modalidade,
     var capacidadeTotal: Int,
-    var local: String,
-    var ativo: Boolean = false,
+    var local: String, // Endereço ou Link
     var preco: Double,
-    var estornaValor: Boolean,
-    var taxaEstorno: Double,
-    var ingressosVendidos: Int = 0
+    var ativo: Boolean = false, // Padrão inativo ao criar
+    val idOrganizador: String, // Email do organizador para vincular
+    var ingressosVendidos: Int = 0,
+    var estornaDinheiro: Boolean = false,
+    var taxaEstorno: Double = 0.0,
+    var idEventoVinculado: Int? = null // Opcional (US 6)
 )
