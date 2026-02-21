@@ -11,7 +11,7 @@ import java.time.Period
 import util.ConsoleTextColor as COR
 
 fun main() {
-    // Banco de dados na memoria para os usuarios e organizadores
+    // Banco de dados na memória para os usuários e organizadores
     val listaUsuarios = mutableListOf<UsuarioComum>()
     val listaOrganizadores = mutableListOf<Organizador>()
     val listaEventos = mutableListOf<Evento>()
@@ -29,8 +29,8 @@ fun main() {
         println("Bem vindo ao Dedê Eventos")
         println(lineBar)
 
-        // Menu de login/reegistro de usuario
-        println("Você já é um usuario cadastrado?\n" +
+        // Menu de login/registro de usuario
+        println("Você já é um usuário cadastrado?\n" +
                 "Escolha uma opção digitando os números\n" +
                 "1) Sim - Fazer login\n" +
                 "2) Não - Registrar-se (Novo Usuário)\n" +
@@ -52,7 +52,7 @@ fun main() {
                 println("Digite sua Senha: ")
                 val senhaLogin = readln().trim()
 
-                // varre a lista para encontrar o usario
+                // varre a lista para encontrar o usuário
                 val usuarioLogado = listaUsuarios.find { it.email == emailLogin && it.senha == senhaLogin}
                 val organizadorLogado = listaOrganizadores.find { it.email == emailLogin && it.senha == senhaLogin}
 
@@ -68,7 +68,7 @@ fun main() {
                             println("\n---- MENU LOGADO ----")
                             println(lineBar)
 
-                            // Logica para menu especifico para cada tipo de usuario
+                            // Logica para menu especifico para cada tipo de usuário
                             if (organizadorLogado != null) {
                                 println("Olá Organizador ${organizadorLogado.nome}!")
                                 println("1) Meu Perfil")
@@ -77,7 +77,7 @@ fun main() {
                                 println("4) Gerenciar Eventos")
                                 println(lineBar)
                             } else if (usuarioLogado != null) {
-                                println("Olá Usuario ${usuarioLogado.nome}!")
+                                println("Olá Usuário ${usuarioLogado.nome}!")
                                 println("1) Meu Perfil")
                                 println("2) Alterar dados do Perfil")
                                 println("3) Inativar Minha Conta")
@@ -108,9 +108,9 @@ fun main() {
                                         println(lineBar)
                                         // dados relacionados a idade e nascimento
                                         val hoje = LocalDate.now()
-                                        val idadeExataCalculada = Period.between(organizadorLogado.dataNacimento, hoje)
+                                        val idadeExataCalculada = Period.between(organizadorLogado.dataNascimento, hoje)
                                         println(
-                                            "Data de Nascimento: ${organizadorLogado.dataNacimento.format(formatterDate)}"
+                                            "Data de Nascimento: ${organizadorLogado.dataNascimento.format(formatterDate)}"
                                         )
                                         println("Idade: ${COR.VERDE}${idadeExataCalculada.years} Anos, ${idadeExataCalculada.months} Meses, ${idadeExataCalculada.days} Dias")
 
@@ -129,12 +129,12 @@ fun main() {
                                         println("Pressione enter para voltar")
                                         readln()
                                     }
-                                    // Perfil do usuario comum
+                                    // Perfil do usuário comum
                                     else if (usuarioLogado != null) {
                                         println(lineBar)
-                                        println(COR.AMARELO + "--- SEU PERFIL (USUARIO) ---" + COR.RESET)
+                                        println(COR.AMARELO + "--- SEU PERFIL (USUÁRIO) ---" + COR.RESET)
 
-                                        // dados do usuario comum
+                                        // dados do usuário comum
                                         println("Nome: ${COR.VERDE}${usuarioLogado.nome}${COR.RESET}")
                                         println("Email: ${usuarioLogado.email}")
                                         println("Gênero: ${usuarioLogado.sexo}")
@@ -156,7 +156,7 @@ fun main() {
                                     var alterandoPerfil = true
                                     while (alterandoPerfil) {
                                         if (organizadorLogado != null) {
-                                            // Alterar usuario organizador
+                                            // Alterar usuário organizador
 
                                             println(lineBar)
                                             println(COR.AMARELO + "--- ALTERAR DADOS ---" + COR.RESET)
@@ -164,7 +164,7 @@ fun main() {
                                             println("1) Nome")
                                             println("2) Senha")
                                             println("3) Sexo/Gênero")
-                                            println("4) Dados Empresariais (Adicionar ou Editar")
+                                            println("4) Dados Empresariais (Adicionar ou Editar)")
                                             println("0) Cancelar")
                                             print("Opção: ")
                                             val opcaoAlterar = readln().toIntOrNull() ?: 0
@@ -180,18 +180,44 @@ fun main() {
                                                 }
 
                                                 2 -> {
-                                                    print("Nova Senha: ")
-                                                    val novaSenha = readln().trim()
-                                                    print("Confirme a Nova Senha: ")
-                                                    val novaSenhaConfirmacao = readln().trim()
-                                                    if (novaSenha.isNotEmpty() && novaSenha == novaSenhaConfirmacao) {
-                                                        organizadorLogado.senha = novaSenha
-                                                        println(COR.VERDE + "Senha atualizada!" + COR.RESET)
-                                                    } else println(COR.VERMELHO + "Senhas não conferem." + COR.RESET)
+                                                    print("Digite sua senha atual: ")
+                                                    val senhaAtual = readln().trim()
+
+                                                    var cicloNovaSenha = true
+
+                                                    var novaSenha = ""
+                                                    var novaSenhaConfirmacao = ""
+
+                                                    if (senhaAtual == organizadorLogado.senha){
+                                                        print("Nova Senha: ")
+                                                        novaSenha = readln().trim()
+                                                        print("Confirme a Nova Senha: ")
+                                                        novaSenhaConfirmacao = readln().trim()
+
+                                                    } else {
+                                                        println(COR.VERMELHO + "ERRO: " + COR.AMARELO + "Senha incorreta! Voltando para o Menu..." + COR.RESET)
+                                                        cicloNovaSenha = false
+                                                    }
+
+                                                    while (cicloNovaSenha) {
+                                                        if (novaSenha.isEmpty()){
+                                                            println(COR.VERMELHO + "ERRO: " + COR.AMARELO + "A nova senha precisa ser preenchida. Por favor digite uma senha" + COR.RESET)
+                                                        }
+                                                        else if (novaSenha.length < 8) {
+                                                            println(COR.VERMELHO + "ERRO: " + COR.AMARELO + "A nova senha precisa possuir 8 ou mais caracteres. Por favor digite uma nova senha" + COR.RESET)
+                                                        }
+                                                        else if (novaSenha != novaSenhaConfirmacao) {
+                                                            println(COR.VERMELHO + "ERRO: " + COR.AMARELO + "As senhas não coincidem por favor digite a senha novamente" + COR.RESET)
+                                                        } else {
+                                                            println(COR.VERDE + "Nova senha cadastrada com sucesso! Prosseguindo..." + COR.RESET)
+                                                            organizadorLogado.senha = novaSenha
+                                                            cicloNovaSenha = false
+                                                        }
+                                                    }
                                                 }
 
                                                 3 -> {
-                                                    println("Novo Gênero (1-Mascculino, 2-Feminino, 3-Outros): ")
+                                                    println("Novo Gênero (1-Masculino, 2-Feminino, 3-Outros): ")
                                                     val opcaoSexo = readln().toIntOrNull() ?: 3
                                                     organizadorLogado.sexo = when (opcaoSexo) {
                                                         1 -> Sexo.MASCULINO; 2 -> Sexo.FEMININO; else -> Sexo.OUTROS
@@ -262,7 +288,7 @@ fun main() {
                                             }
 
                                         } else if (usuarioLogado != null) {
-                                            // Alterar usuario comum
+                                            // Alterar usuário comum
                                             println(lineBar)
                                             println(COR.AMARELO + "--- ALTERAR DADOS ---" + COR.RESET)
                                             println("O que você deseja alterar?")
@@ -284,18 +310,44 @@ fun main() {
                                                 }
 
                                                 2 -> {
-                                                    print("Nova Senha: ")
-                                                    val novaSenha = readln().trim()
-                                                    print("Confirme a Nova Senha: ")
-                                                    val novaSenhaConfirmacao = readln().trim()
-                                                    if (novaSenha.isNotEmpty() && novaSenha == novaSenhaConfirmacao) {
-                                                        usuarioLogado.senha = novaSenha
-                                                        println(COR.VERDE + "Senha atualizada!" + COR.RESET)
-                                                    } else println(COR.VERMELHO + "Senhas não conferem." + COR.RESET)
+                                                    print("Digite sua senha atual: ")
+                                                    val senhaAtual = readln().trim()
+
+                                                    var cicloNovaSenha = true
+
+                                                    var novaSenha = ""
+                                                    var novaSenhaConfirmacao = ""
+
+                                                    if (senhaAtual == usuarioLogado.senha){
+                                                        print("Nova Senha: ")
+                                                        novaSenha = readln().trim()
+                                                        print("Confirme a Nova Senha: ")
+                                                        novaSenhaConfirmacao = readln().trim()
+
+                                                    } else {
+                                                        println(COR.VERMELHO + "ERRO: " + COR.AMARELO + "Senha incorreta! Voltando para o Menu..." + COR.RESET)
+                                                        cicloNovaSenha = false
+                                                    }
+
+                                                    while (cicloNovaSenha) {
+                                                        if (novaSenha.isEmpty()){
+                                                            println(COR.VERMELHO + "ERRO: " + COR.AMARELO + "A nova senha precisa ser preenchida. Por favor digite uma senha" + COR.RESET)
+                                                        }
+                                                        else if (novaSenha.length < 8) {
+                                                            println(COR.VERMELHO + "ERRO: " + COR.AMARELO + "A nova senha precisa possuir 8 ou mais caracteres. Por favor digite uma nova senha" + COR.RESET)
+                                                        }
+                                                        else if (novaSenha != novaSenhaConfirmacao) {
+                                                            println(COR.VERMELHO + "ERRO: " + COR.AMARELO + "As senhas não coincidem por favor digite a senha novamente" + COR.RESET)
+                                                        } else {
+                                                            println(COR.VERDE + "Nova senha cadastrada com sucesso! Prosseguindo..." + COR.RESET)
+                                                            usuarioLogado.senha = novaSenha
+                                                            cicloNovaSenha = false
+                                                        }
+                                                    }
                                                 }
 
                                                 3 -> {
-                                                    println("Novo Gênero (1-Mascculino, 2-Feminino, 3-Outros): ")
+                                                    println("Novo Gênero (1-Masculino, 2-Feminino, 3-Outros): ")
                                                     val opcaoSexo = readln().toIntOrNull() ?: 3
                                                     usuarioLogado.sexo = when (opcaoSexo) {
                                                         1 -> Sexo.MASCULINO; 2 -> Sexo.FEMININO; else -> Sexo.OUTROS
@@ -307,10 +359,8 @@ fun main() {
                                                     println("Operação cancelada.")
                                                     alterandoPerfil = false
                                                 }
-
                                                 else -> println("Opção inválida.")
                                             }
-
                                         }
                                     }
                                     println("Pressione ENTER para voltar...")
@@ -327,10 +377,25 @@ fun main() {
 
                                     if (confirmacao == 1) {
                                         if (organizadorLogado != null) {
-                                            // TODO: Futuramente, verificar se ele tem eventos ativos antes de deixar inativar
-                                            organizadorLogado.ativo = false
-                                            println(COR.VERMELHO + "Conta de Organizador inativada." + COR.RESET)
-                                            sessaoAtiva = false // Desloga automaticamente
+                                            val agora = LocalDateTime.now()
+
+                                            // Verifica se existem eventos ativos ou em andamento
+                                            val possuiEventosAtivos = listaEventos.any { evento ->
+                                                evento.idOrganizador == organizadorLogado.email &&
+                                                        evento.ativo &&
+                                                        agora.isBefore(evento.dataFim) // cobre eventos futuros e em andamento
+                                            }
+
+                                            if (possuiEventosAtivos) {
+                                                println(COR.VERMELHO + "Não é possível desativar a conta: você possui eventos ativos ou em andamento." + COR.RESET)
+                                                println("Pressione ENTER para voltar ao menu...")
+                                                readln()
+                                            } else {
+                                                organizadorLogado.ativo = false
+                                                println(COR.VERMELHO + "Conta de Organizador inativada." + COR.RESET)
+                                                sessaoAtiva = false // Desloga automaticamente
+                                            }
+
                                         } else if (usuarioLogado != null) {
                                             usuarioLogado.ativo = false
                                             println(COR.VERMELHO + "Conta de Usuário inativada." + COR.RESET)
@@ -431,6 +496,7 @@ fun main() {
                                                     print("Preço do Ingresso (0 para gratuito): ")
                                                     val precoEv = readln().toDoubleOrNull() ?: 0.0
 
+
                                                     // Politica de cancelamento
                                                     print("Permite estorno em caso de cancelamento? (1-Sim, 2-Não): ")
                                                     val estornoOp = readln().toIntOrNull() ?: 2
@@ -448,6 +514,21 @@ fun main() {
                                                     val idVinculadoFinal =
                                                         if (idVinc > 0 && listaEventos.any { it.id == idVinc }) idVinc else null
 
+                                                    print("Deseja marcar esse evento como Ativo ou Inativo?" +
+                                                            "\n1) Ativo" +
+                                                            "\n2) Inativo\n\n")
+                                                    val inputStatusEv = readln().toIntOrNull() ?: 2
+                                                    var statusEv = false
+                                                    if (inputStatusEv == 1){
+                                                        println("Este evento foi definido como Ativo.")
+                                                        statusEv = true
+                                                    } else if (inputStatusEv == 2){
+                                                        println("Este evento foi definido como Inativo.")
+                                                        statusEv = false
+                                                    } else {
+                                                        println("Entrada inválida! Evento definido como Inativo.")
+                                                    }
+
                                                     // Criação do Objeto
                                                     val novoId = (listaEventos.maxOfOrNull { it.id } ?: 0) + 1
                                                     val novoEvento = entities.Evento(
@@ -461,7 +542,7 @@ fun main() {
                                                         capacidadeTotal = capEv,
                                                         local = localEv,
                                                         preco = precoEv,
-                                                        ativo = false,
+                                                        ativo = statusEv,
                                                         idOrganizador = organizadorLogado.email, // Vincula usando o email
                                                         estornaDinheiro = permiteEstorno,
                                                         taxaEstorno = taxaEstorno,
@@ -696,26 +777,26 @@ fun main() {
                                                         for (evento in eventosDisponiveis) {
                                                             println("${COR.AZUL}[$contador]${COR.RESET} ${COR.NEGRITO}${evento.nome}${COR.RESET}")
                                                             println(
-                                                                "📅 Início: ${
+                                                                "Início: ${
                                                                     evento.dataInicio.format(
                                                                         formatterDataHora
                                                                     )
                                                                 }"
                                                             )
-                                                            println("🏁 Fim: ${evento.dataFim.format(formatterDataHora)}")
-                                                            println("📍 Local: ${evento.local}")
-                                                            println("🏷️  Tipo: ${evento.tipo}")
-                                                            println("🎭 Modalidade: ${evento.modalidade}")
+                                                            println("Fim: ${evento.dataFim.format(formatterDataHora)}")
+                                                            println("Local: ${evento.local}")
+                                                            println("Tipo: ${evento.tipo}")
+                                                            println("Modalidade: ${evento.modalidade}")
 
                                                             if (evento.preco == 0.0) {
-                                                                println("💰 ${COR.VERDE}GRATUITO${COR.RESET}")
+                                                                println("${COR.VERDE}GRATUITO${COR.RESET}")
                                                             } else {
-                                                                println("💰 R$ %.2f".format(evento.preco))
+                                                                println("R$ %.2f".format(evento.preco))
                                                             }
 
                                                             val vagasDisponiveis =
                                                                 evento.capacidadeTotal - evento.ingressosVendidos
-                                                            println("👥 Vagas: $vagasDisponiveis/${evento.capacidadeTotal}")
+                                                            println("Vagas: $vagasDisponiveis/${evento.capacidadeTotal}")
 
                                                             // CORREÇÃO 1: Buscar organizador pelo e-mail
                                                             var nomeOrganizador = "Desconhecido"
@@ -725,7 +806,7 @@ fun main() {
                                                                     break
                                                                 }
                                                             }
-                                                            println("👤 Organizador: $nomeOrganizador")
+                                                            println("Organizador: $nomeOrganizador")
 
                                                             var jaTemIngresso = false
                                                             for (ingresso in listaIngressos) {
@@ -740,7 +821,7 @@ fun main() {
                                                                 }
                                                             }
                                                             if (jaTemIngresso) {
-                                                                println(COR.VERDE + "✓ Você já tem ingresso para este evento" + COR.RESET)
+                                                                println(COR.VERDE + "Você já tem ingresso para este evento" + COR.RESET)
                                                             }
                                                             println(lineBar)
                                                             contador++
@@ -786,8 +867,8 @@ fun main() {
                                                             val vagas =
                                                                 evento.capacidadeTotal - evento.ingressosVendidos
                                                             println("${COR.AZUL}[$contador]${COR.RESET} ${evento.nome}")
-                                                            println(" 📅 ${evento.dataInicio.format(formatterDataHora)}")
-                                                            println(" 💰 R$ %.2f | Vagas: $vagas".format(evento.preco))
+                                                            println(" ${evento.dataInicio.format(formatterDataHora)}")
+                                                            println(" R$ %.2f | Vagas: $vagas".format(evento.preco))
                                                             println(lineBar)
                                                             contador++
                                                         }
@@ -842,7 +923,7 @@ fun main() {
                                                                     )
 
                                                                     if (eventoVinculado != null) {
-                                                                        println(COR.AMARELO + "⚠️ Este evento está vinculado ao evento: ${eventoVinculado.nome}" + COR.RESET)
+                                                                        println(COR.AMARELO + "Este evento está vinculado ao evento: ${eventoVinculado.nome}" + COR.RESET)
                                                                         println("Você receberá ingressos para AMBOS os eventos.")
                                                                         valorTotal += eventoVinculado.preco
                                                                         ingressosAComprar.add(
@@ -853,7 +934,7 @@ fun main() {
                                                                         )
                                                                     }
 
-                                                                    println("\n💰 Valor total: R$ %.2f".format(valorTotal))
+                                                                    println("\nValor total: R$ %.2f".format(valorTotal))
                                                                     println("\nConfirmar compra? (1-Sim, 2-Não)")
 
                                                                     val confirmacao = readln().toIntOrNull() ?: 2
@@ -897,7 +978,7 @@ fun main() {
 
                                                                         if (compraRealizada) {
                                                                             println("\n$lineBar")
-                                                                            println(COR.VERDE + "✓ COMPRA REALIZADA COM SUCESSO!" + COR.RESET)
+                                                                            println(COR.VERDE + "COMPRA REALIZADA COM SUCESSO!" + COR.RESET)
                                                                             println(lineBar)
                                                                             println("Ingressos adquiridos:")
                                                                             for (ing in ingressosCriados) {
@@ -915,7 +996,7 @@ fun main() {
                                                                                 )
                                                                             }
                                                                             println(
-                                                                                "💰 Total pago: R$ %.2f".format(
+                                                                                "Total pago: R$ %.2f".format(
                                                                                     valorTotal
                                                                                 )
                                                                             )
@@ -963,8 +1044,8 @@ fun main() {
                                                                 }
                                                             }
                                                             println("${COR.AZUL}[$contador]${COR.RESET} $eventoNome")
-                                                            println(" 📅 $eventoData")
-                                                            println(" 💰 Pago: R$ %.2f".format(ingresso.precoPago))
+                                                            println("$eventoData")
+                                                            println("Pago: R$ %.2f".format(ingresso.precoPago))
                                                             println(lineBar)
                                                             contador++
                                                         }
@@ -992,22 +1073,22 @@ fun main() {
                                                                     valorEstorno =
                                                                         ingressoEscolhido.precoPago * (1 - eventoIngresso.taxaEstorno)
                                                                     println(
-                                                                        "💰 Valor pago: R$ %.2f".format(
+                                                                        "Valor pago: R$ %.2f".format(
                                                                             ingressoEscolhido.precoPago
                                                                         )
                                                                     )
                                                                     println(
-                                                                        "📉 Taxa de estorno: %.0f%%".format(
+                                                                        "Taxa de estorno: %.0f%%".format(
                                                                             eventoIngresso.taxaEstorno * 100
                                                                         )
                                                                     )
                                                                     println(
-                                                                        "💵 Valor a receber: R$ %.2f".format(
+                                                                        "Valor a receber: R$ %.2f".format(
                                                                             valorEstorno
                                                                         )
                                                                     )
                                                                 } else {
-                                                                    println(COR.AMARELO + "⚠️ Este evento não faz estorno de valores." + COR.RESET)
+                                                                    println(COR.AMARELO + "Este evento não faz estorno de valores." + COR.RESET)
                                                                 }
 
                                                                 println("\nConfirmar cancelamento? (1-Sim, 2-Não)")
@@ -1016,15 +1097,15 @@ fun main() {
                                                                     ingressoEscolhido.status = StatusIngresso.CANCELADO
                                                                     eventoIngresso.ingressosVendidos--
                                                                     println("\n$lineBar")
-                                                                    println(COR.VERDE + "✓ INGRESSO CANCELADO COM SUCESSO!" + COR.RESET)
+                                                                    println(COR.VERDE + "INGRESSO CANCELADO COM SUCESSO!" + COR.RESET)
                                                                     if (valorEstorno > 0) {
                                                                         println(
-                                                                            "💵 Valor estornado: R$ %.2f".format(
+                                                                            "Valor estornado: R$ %.2f".format(
                                                                                 valorEstorno
                                                                             )
                                                                         )
                                                                     }
-                                                                    println("🎟️ Vaga liberada no evento.")
+                                                                    println("Vaga liberada no evento.")
                                                                     println(lineBar)
                                                                 } else {
                                                                     println(COR.AMARELO + "Cancelamento não realizado." + COR.RESET)
@@ -1108,35 +1189,35 @@ fun main() {
 
                                                         // Exibição
                                                         if (ingressosAtivos.isNotEmpty()) {
-                                                            println(COR.VERDE + "📋 EVENTOS ATIVOS (${ingressosAtivos.size})" + COR.RESET)
+                                                            println(COR.VERDE + "EVENTOS ATIVOS (${ingressosAtivos.size})" + COR.RESET)
                                                             println(lineBar)
                                                             for (par in ingressosAtivos) {
                                                                 val ing = par.first
                                                                 val evt = par.second
-                                                                println("🎟️ ${COR.NEGRITO}${evt.nome}${COR.RESET}")
-                                                                println("   ID Ingresso: #${ing.id}")
-                                                                println("   📅 ${evt.dataInicio.format(formatterDataHora)}")
-                                                                println("   📍 ${evt.local}")
-                                                                println("   💰 R$ %.2f".format(ing.precoPago))
-                                                                println("   ✅ Status: ${COR.VERDE}ATIVO${COR.RESET}")
+                                                                println("️${COR.NEGRITO}${evt.nome}${COR.RESET}")
+                                                                println("ID Ingresso: #${ing.id}")
+                                                                println("${evt.dataInicio.format(formatterDataHora)}")
+                                                                println("${evt.local}")
+                                                                println("R$ %.2f".format(ing.precoPago))
+                                                                println("Status: ${COR.VERDE}ATIVO${COR.RESET}")
                                                                 println(lineBar)
                                                             }
                                                         }
 
                                                         if (ingressosInativos.isNotEmpty()) {
-                                                            println(COR.AMARELO + "📋 EVENTOS FINALIZADOS/CANCELADOS (${ingressosInativos.size})" + COR.RESET)
+                                                            println(COR.AMARELO + "EVENTOS FINALIZADOS/CANCELADOS (${ingressosInativos.size})" + COR.RESET)
                                                             println(lineBar)
                                                             for (par in ingressosInativos) {
                                                                 val ing = par.first
                                                                 val evt = par.second
-                                                                println("🎟️ ${evt.nome}")
-                                                                println("   ID Ingresso: #${ing.id}")
-                                                                println("   📅 ${evt.dataInicio.format(formatterDataHora)}")
-                                                                println("   💰 R$ %.2f".format(ing.precoPago))
+                                                                println("${evt.nome}")
+                                                                println("ID Ingresso: #${ing.id}")
+                                                                println("${evt.dataInicio.format(formatterDataHora)}")
+                                                                println("R$ %.2f".format(ing.precoPago))
                                                                 if (ing.status == StatusIngresso.CANCELADO) {
-                                                                    println("   ❌ Status: ${COR.VERMELHO}CANCELADO${COR.RESET}")
+                                                                    println("Status: ${COR.VERMELHO}CANCELADO${COR.RESET}")
                                                                 } else {
-                                                                    println("   ✓ Status: ${COR.AMARELO}FINALIZADO${COR.RESET}")
+                                                                    println("Status: ${COR.AMARELO}FINALIZADO${COR.RESET}")
                                                                 }
                                                                 println(lineBar)
                                                             }
@@ -1170,27 +1251,27 @@ fun main() {
         2 -> {
             println("\n---- REGISTRO DE NOVO USUÁRIO ----")
                                 println("Para qual finalidade gostaria de Criar sua conta?")
-                                println("1) Quero participar de Eventos (Usuario Comum)")
+                                println("1) Quero participar de Eventos (Usuário Comum)")
                                 println("2) Quero Organizar Eventos (Conta de Organizador")
                                 println("0) Voltar")
                                 println(lineBar)
 
-                                val opcaoResgistroConta = readln().toIntOrNull() ?: 0
+                                val opcaoRegistroConta = readln().toIntOrNull() ?: 0
                                 println(lineBar)
-                                when(opcaoResgistroConta) {
+                                when(opcaoRegistroConta) {
                                     0 -> {
                                         println("Voltando..")
                                     }
                                     1 -> {
-                                        println(COR.AMARELO + "--- CRIANDO PERFIL (USUARIO) ---" + COR.RESET)
-                                        // Variaveis para o ciclo de vida da criação do usuario e contramedidas contra erros do usuario possibilitando repetição
+                                        println(COR.AMARELO + "--- CRIANDO PERFIL (USUÁRIO) ---" + COR.RESET)
+                                        // Variáveis para o ciclo de vida da criação do usuário e contramedidas contra erros do usuário possibilitando repetição
                                         var cicloCriarUsuarioComum = true
                                         var cicloEmail = true
                                         var cicloSenha = true
                                         var cicloNome = true
-                                        var cicloDataNacimento = true
+                                        var cicloDataNascimento = true
 
-                                        // variaveis para armazenar os dados do usuario de forma segura
+                                        // variáveis para armazenar os dados do usuário de forma segura
                                         var nome = ""
                                         var email = ""
                                         var senha = ""
@@ -1203,20 +1284,20 @@ fun main() {
 
                                         while (cicloCriarUsuarioComum) {
                                             while (cicloEmail) {
-                                                println("Vamos criar um usuario comum então")
+                                                println("Vamos criar um usuário comum então")
                                                 println(lineBar)
                                                 print("\nDigite seu email: ")
                                                 val inputEmail = readln().trim()
-                                                // Verificação de formato correto do email, criterio: Conter o @ e 5 ou mais caracteres
+                                                // Verificação de formato correto do email, critério: Conter o @ e 5 ou mais caracteres
                                                 if (inputEmail.contains("@") && inputEmail.length >= 5) {
-                                                    // Variaveis para verificação de duplicidade de email nos usuarios comuns e organizadores
+                                                    // Variáveis para verificação de duplicidade de email nos usuários comuns e organizadores
                                                     val verificarDuplicidadeEmailUsuarioComum =
                                                         listaUsuarios.any { it.email == inputEmail }
                                                     val verificarDuplicidadeEmailOrganizador =
                                                         listaOrganizadores.any { it.email == inputEmail }
-                                                    // Condicional Verifdicando emails duplicados
+                                                    // Condicional Verificando emails duplicados
                                                     if (verificarDuplicidadeEmailUsuarioComum || verificarDuplicidadeEmailOrganizador) {
-                                                        println(COR.VERMELHO + "ERRO: " + COR.AMARELO + " Email informado ja cadastrado, por favor efetui o login ou utilize um email diferente" + COR.RESET)
+                                                        println(COR.VERMELHO + "ERRO: " + COR.AMARELO + " Email informado ja cadastrado, por favor efetue o login ou utilize um email diferente" + COR.RESET)
                                                     } else {
                                                         println(COR.VERDE + "E-mail válido e disponível. Prosseguindo..." + COR.RESET)
                                                         email = inputEmail
@@ -1238,13 +1319,13 @@ fun main() {
                                                 val inputSenhaConfirmacao = readln().trim()
 
                                                 if (inputSenha.isEmpty()){
-                                                    println(COR.VERMELHO + "ERRO: " + COR.AMARELO + " A senha precisa ser preenchida. Por favor digite uma senha" + COR.RESET)
+                                                    println(COR.VERMELHO + "ERRO: " + COR.AMARELO + "A senha precisa ser preenchida. Por favor digite uma senha" + COR.RESET)
                                                 }
                                                 else if (inputSenha.length < 8) {
-                                                    println(COR.VERMELHO + "ERRO: " + COR.AMARELO + " A senha precisa possuir 8 ou mais caracteres. Por favor digite uma nova senha" + COR.RESET)
+                                                    println(COR.VERMELHO + "ERRO: " + COR.AMARELO + "A senha precisa possuir 8 ou mais caracteres. Por favor digite uma nova senha" + COR.RESET)
                                                 }
                                                 else if (inputSenha != inputSenhaConfirmacao) {
-                                                    println(COR.VERMELHO + "ERRO: " + COR.AMARELO + " As senhas não coincidem por favor digite a senha novamente" + COR.RESET)
+                                                    println(COR.VERMELHO + "ERRO: " + COR.AMARELO + "As senhas não coincidem por favor digite a senha novamente" + COR.RESET)
                                                 } else {
                                                     println(COR.VERDE + "Senha cadastrada com sucesso! Prosseguindo..." + COR.RESET)
                                                     senha = inputSenha
@@ -1277,7 +1358,7 @@ fun main() {
                                                 }
                                             }
                                             println(COR.VERDE + "Gênero cadastrado com sucesso! Prosseguindo..." + COR.RESET)
-                                            while (cicloDataNacimento) {
+                                            while (cicloDataNascimento) {
                                                 println(lineBar)
                                                 val hoje = LocalDate.now()
 
@@ -1305,10 +1386,10 @@ fun main() {
                                                         val idadeCalculada = Period.between(dataConvertida, hoje).years
                                                         println(COR.AMARELO + "Sua idade atual: $idadeCalculada anos." + COR.RESET)
                                                     }else {
-                                                        // Se for bem sucessido
+                                                        // Se for bem-sucedido
                                                         dataNascimento = dataConvertida
                                                         println(COR.VERDE + "Data de nascimento valida! Idade Confirmada" + COR.RESET)
-                                                        cicloDataNacimento = false
+                                                        cicloDataNascimento = false
                                                     }
 
                                                 }catch (e: Exception) {
@@ -1324,7 +1405,7 @@ fun main() {
                                                 cicloNome = true
                                                 cicloEmail = true
                                                 cicloSenha = true
-                                                cicloDataNacimento = true
+                                                cicloDataNascimento = true
                                             } else {
                                                 try {
                                                     listaUsuarios.add(UsuarioComum(nome, dataNascimento, sexo, email, senha))
@@ -1337,7 +1418,7 @@ fun main() {
                                         }
                                     }
                                     2 -> {
-                                        // Ciclo de criação de usuario organizador
+                                        // Ciclo de criação de usuário organizador
                                         println(lineBar)
                                         println(COR.AMARELO + "--- CRIANDO PERFIL (ORGANIZADOR) ---" + COR.RESET)
 
@@ -1345,9 +1426,9 @@ fun main() {
                                         var cicloEmail = true
                                         var cicloSenha = true
                                         var cicloNome = true
-                                        var cicloDataNacimento = true
+                                        var cicloDataNascimento = true
 
-                                        // variaveis para armazenar os dados do organizador de forma segura
+                                        // variáveis para armazenar os dados do organizador de forma segura
                                         var nome = ""
                                         var email = ""
                                         var senha = ""
@@ -1355,7 +1436,7 @@ fun main() {
                                         var sexo : Sexo = Sexo.OUTROS
                                         val ativo: Boolean = true
 
-                                        // Dados opicionais da empresa
+                                        // Dados opcionais da empresa
                                         var cnpj: String? = null
                                         var razaoSocial: String? = null
                                         var nomeFantasia: String? = null
@@ -1365,20 +1446,20 @@ fun main() {
 
                                         while (cicloCriarOrganizador) {
                                             while (cicloEmail) {
-                                                println("Vamos criar um usuario organizador então")
+                                                println("Vamos criar um usuário organizador então")
                                                 println(lineBar)
                                                 print("\nDigite seu email: ")
                                                 val inputEmail = readln().trim()
-                                                // Verificação de formato correto do email, criterio: Conter o @ e 5 ou mais caracteres
+                                                // Verificação de formato correto do email, critério: Conter o @ e 5 ou mais caracteres
                                                 if (inputEmail.contains("@") && inputEmail.length >= 5) {
-                                                    // Variaveis para verificação de duplicidade de email nos usuarios comuns e organizadores
+                                                    // Variáveis para verificação de duplicidade de email nos usuários comuns e organizadores
                                                     val verificarDuplicidadeEmailUsuarioComum =
                                                         listaUsuarios.any { it.email == inputEmail }
                                                     val verificarDuplicidadeEmailOrganizador =
                                                         listaOrganizadores.any { it.email == inputEmail }
-                                                    // Condicional Verifdicando emails duplicados
+                                                    // Condicional Verificando emails duplicados
                                                     if (verificarDuplicidadeEmailUsuarioComum || verificarDuplicidadeEmailOrganizador) {
-                                                        println(COR.VERMELHO + "ERRO: " + COR.AMARELO + " Email informado ja cadastrado, por favor efetui o login ou utilize um email diferente" + COR.RESET)
+                                                        println(COR.VERMELHO + "ERRO: " + COR.AMARELO + "Email informado ja cadastrado, por favor efetue o login ou utilize um email diferente" + COR.RESET)
                                                     } else {
                                                         println(COR.VERDE + "E-mail válido e disponível. Prosseguindo..." + COR.RESET)
                                                         email = inputEmail
@@ -1400,13 +1481,13 @@ fun main() {
                                                 val inputSenhaConfirmacao = readln().trim()
 
                                                 if (inputSenha.isEmpty()){
-                                                    println(COR.VERMELHO + "ERRO: " + COR.AMARELO + " A senha precisa ser preenchida. Por favor digite uma senha" + COR.RESET)
+                                                    println(COR.VERMELHO + "ERRO: " + COR.AMARELO + "A senha precisa ser preenchida. Por favor digite uma senha" + COR.RESET)
                                                 }
                                                 else if (inputSenha.length < 8) {
-                                                    println(COR.VERMELHO + "ERRO: " + COR.AMARELO + " A senha precisa possuir 8 ou mais caracteres. Por favor digite uma nova senha" + COR.RESET)
+                                                    println(COR.VERMELHO + "ERRO: " + COR.AMARELO + "A senha precisa possuir 8 ou mais caracteres. Por favor digite uma nova senha" + COR.RESET)
                                                 }
                                                 else if (inputSenha != inputSenhaConfirmacao) {
-                                                    println(COR.VERMELHO + "ERRO: " + COR.AMARELO + " As senhas não coincidem por favor digite a senha novamente" + COR.RESET)
+                                                    println(COR.VERMELHO + "ERRO: " + COR.AMARELO + "As senhas não coincidem por favor digite a senha novamente" + COR.RESET)
                                                 } else {
                                                     println(COR.VERDE + "Senha cadastrada com sucesso! Prosseguindo..." + COR.RESET)
                                                     senha = inputSenha
@@ -1439,7 +1520,7 @@ fun main() {
                                                 }
                                             }
                                             println(COR.VERDE + "Gênero cadastrado com sucesso! Prosseguindo..." + COR.RESET)
-                                            while (cicloDataNacimento) {
+                                            while (cicloDataNascimento) {
                                                 println(lineBar)
                                                 val hoje = LocalDate.now()
 
@@ -1467,10 +1548,10 @@ fun main() {
                                                         val idadeCalculada = Period.between(dataConvertida, hoje).years
                                                         println(COR.AMARELO + "Sua idade atual: $idadeCalculada anos." + COR.RESET)
                                                     }else {
-                                                        // Se for bem sucessido
+                                                        // Se for bem-sucedido
                                                         dataNascimento = dataConvertida
                                                         println(COR.VERDE + "Data de nascimento valida! Idade Confirmada" + COR.RESET)
-                                                        cicloDataNacimento = false
+                                                        cicloDataNascimento = false
                                                     }
 
                                                 }catch (e: Exception) {
@@ -1483,7 +1564,7 @@ fun main() {
                                             var cadastrarEmpresa = true
                                             while (cadastrarEmpresa) {
                                                 println(lineBar)
-                                                println("Você representa uma Empresa/Intituição?")
+                                                println("Você representa uma Empresa/Instituição?")
                                                 println("1) Sim (Sou Pessoa Jurídica)")
                                                 println("2) Não (Sou Pessoa Física")
                                                 print("Opção: ")
@@ -1518,7 +1599,7 @@ fun main() {
                                                 cicloNome = true
                                                 cicloEmail = true
                                                 cicloSenha = true
-                                                cicloDataNacimento = true
+                                                cicloDataNascimento = true
 
                                                 cnpj = null
                                                 razaoSocial = null
