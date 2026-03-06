@@ -11,6 +11,7 @@ import java.time.Period
 import util.ConsoleTextColor as COR
 
 fun main() {
+
     // Banco de dados na memória para os usuários e organizadores
     val listaUsuarios = mutableListOf<UsuarioComum>()
     val listaOrganizadores = mutableListOf<Organizador>()
@@ -25,6 +26,29 @@ fun main() {
     // loop para o funcionamento do programa
     var sistemaRodando = true
     while (sistemaRodando) {
+
+        /**
+         * O ideal aqui era essa parte ficar num loop de do..while.
+         * No início, você teria o when
+         * depois a impressão do menu
+         * e por fim, vocês teriam a validação do na condição do while.
+         *
+         * ex:
+         *
+         * var inputAutenticadao: Int = 0
+         *
+         * do {
+         *      when(inputAutenticadao) {
+         *          0 -> {}
+         *          1 -> { codigo}
+         *          2 -> {}
+         *          3 -> {}
+         *          else -> println("Opção inválida")
+         *      }
+         *      prints do menu
+         * } while(inputAutenticacao < 0 || inputAutenticacao > 3)
+         * println(COR.AMARELO + "Saindo do Dendê Eventos." + COR.AZUL + " Até logo!" + COR.RESET)
+         */
         println(lineBar)
         println("Bem vindo ao Dedê Eventos")
         println(lineBar)
@@ -53,9 +77,30 @@ fun main() {
                 val senhaLogin = readln().trim()
 
                 // varre a lista para encontrar o usuário
+                /***
+                 *  acho que aqui valia primeiro definir o usuário
+                 *  val usuario = listaUsuarios.find { it.email == emailLogin && it.senha == senhaLogin} ?:
+                 *  listaOrganizadores.find { it.email == emailLogin && it.senha == senhaLogin}
+                 *
+                 *  as demais verificações são mais baseadas no tipo do usuário
+                 *
+                 *  if (usuario is UsuarioComum)
+                 *  ou
+                 *  if (usuario is Organizador)
+                 *
+                 *  when(usuario) {
+                 *
+                 *  UsuarioComum -> {}
+                 *  Organizador -> {}
+                 *
+                 *  melhora a legibilidade do código também
+                 */
                 val usuarioLogado = listaUsuarios.find { it.email == emailLogin && it.senha == senhaLogin}
                 val organizadorLogado = listaOrganizadores.find { it.email == emailLogin && it.senha == senhaLogin}
 
+
+                //vocês poderiam deixar apenas esse if, pois o ?. faz a checagem do null
+                // if(usuario?.ativo == true)
                 if (usuarioLogado != null || organizadorLogado != null) {
                     if (usuarioLogado?.ativo == true || organizadorLogado?.ativo == true) {
                         println(lineBar)
@@ -63,12 +108,54 @@ fun main() {
                         println(lineBar)
                         var sessaoAtiva = true
 
+                        /* qual a diferença desse cara para um while true?
+                          por que agora você tem uma variável de controle?
+                          no final, você fica com duas variáveis de controle a sessaoAtiva e a opcaoMenuLogado
+                          não é uma boa abordagem. Você deveria ter apenas a opcaoMenuLogado.
 
+                          mas como fazer isso?
+
+                          1. cria a variável opcaoMenuLogado já com a opção de saída por padrão
+                          2. A condição de parada deve ser enquanto o valor digitado for igual ao valor de saída
+                          3. use o do..while
+                          4. coloque o when logo no início
+                          5. coloque a leitura no final, coladinho com o while
+                          6. faça a condição do while(opcaoMenuLogado != 0)
+                          println(COR.AMARELO + "Realizando logout..." + COR.RESET)
+
+                          eu tenho uma outra sugestão aqui:
+                          eu separaria todo o fluxo de organizador e do usuário comum.
+                          faria um while para cada com as coisas de cada um baseado nos seus tipos.
+                          ficaria mais fácil de compreender e separaria as responsabilidades
+
+                          tipo:
+
+                          if( usuario is UsuarioComum) {
+
+                            do {
+
+
+                            } while(opcao != 0)
+
+                          }  else {
+
+                            do {
+
+
+                            while(opcao != 0)
+
+                          }
+
+                          por quê? porque tudo que fosse do usuário comum ficaria em cima
+                          e tudo que fosse do organizador em baixo, fica mais fácil de ler o código assim
+                          cada um com sua responsabilidade.
+
+                         */
                         while (sessaoAtiva) {
                             println("\n---- MENU LOGADO ----")
                             println(lineBar)
-
                             // Logica para menu especifico para cada tipo de usuário
+                            //if(usuario is Organizador)
                             if (organizadorLogado != null) {
                                 println("Olá Organizador ${organizadorLogado.nome}!")
                                 println("1) Meu Perfil")
@@ -76,7 +163,9 @@ fun main() {
                                 println("3) Inativar Minha Conta")
                                 println("4) Gerenciar Eventos")
                                 println(lineBar)
-                            } else if (usuarioLogado != null) {
+                            }
+                            //nesse caso só o else basta
+                            else if (usuarioLogado != null) {
                                 println("Olá Usuário ${usuarioLogado.nome}!")
                                 println("1) Meu Perfil")
                                 println("2) Alterar dados do Perfil")
@@ -88,6 +177,7 @@ fun main() {
                             println(lineBar)
 
                             println("Escolha: ")
+                            //deveria ser var e ficar fora do laço
                             val opcaoMenuLogado = readln().toIntOrNull() ?: 0
                             println(lineBar)
 
