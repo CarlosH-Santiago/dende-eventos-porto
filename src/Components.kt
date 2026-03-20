@@ -1,5 +1,11 @@
 // Arquivo: Components.kt
 
+import java.time.LocalDateTime
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.Duration
+
+
 /**
  * Lê valores inteiros até que o valor esteja dentro do intervalo especificado.
  */
@@ -54,6 +60,43 @@ fun readString(message: String, errorMessage: String, minLength: Int = 0): Strin
             return input
         } else {
             println("Erro: $errorMessage")
+        }
+    }
+}
+
+fun lerDatasEvento(): Pair<LocalDateTime, LocalDateTime> {
+    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+
+    while (true) {
+        try {
+            print("Início (dd/MM/yyyy HH:mm): ")
+            val dataIni = LocalDateTime.parse(readln(), formatter)
+
+            print("Fim (dd/MM/yyyy HH:mm): ")
+            val dataFim = LocalDateTime.parse(readln(), formatter)
+
+            val agora = LocalDateTime.now()
+
+            when {
+                dataIni.isBefore(agora) -> {
+                    println("Erro: O evento não pode começar no passado.")
+                }
+
+                dataFim.isBefore(dataIni) -> {
+                    println("Erro: A data de fim não pode ser antes do início.")
+                }
+
+                Duration.between(dataIni, dataFim).toMinutes() < 30 -> {
+                    println("Erro: O evento deve ter no mínimo 30 minutos.")
+                }
+
+                else -> {
+                    return Pair(dataIni, dataFim)
+                }
+            }
+
+        } catch (e: Exception) {
+            println("Formato inválido. Use dd/MM/yyyy HH:mm")
         }
     }
 }
