@@ -68,7 +68,7 @@ data class Evento(
 
 data class Ingresso(
     val id: Int,
-    val idUsuario: Int,
+    val idUsuario: String,
     val idEvento: Int,
     val precoPago: Double,
     var status: StatusIngresso = StatusIngresso.ATIVO
