@@ -24,6 +24,16 @@ fun main() {
     val formatterDate = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
     // loop para o funcionamento do programa
+    // [Critério 2 - Loop Adequado] 'while(sistemaRodando)' usa uma variável booleana como flag de controle, o que é equivalente a um while(true).
+    // loops while(true) não são uma boa prática de programação, pois dificultam a compreensão da condição de parada.
+    // [Critério 14 - do..while] Uma sugestão para esse cenário, talvez, fosse você escrever esse laço como do..while:
+    //   var opcao: Int
+    //   do {
+    //       // exibe menu principal
+    //       opcao = readln().toIntOrNull() ?: 0
+    //       when(opcao) { 1 -> {} ... }
+    //   } while(opcao != 0)
+    //   println("Saindo do Dendê Eventos...")
     var sistemaRodando = true
     while (sistemaRodando) {
 
@@ -76,29 +86,25 @@ fun main() {
                 println("Digite sua Senha: ")
                 val senhaLogin = readln().trim()
 
-                // varre a lista para encontrar o usuário
-                /***
-                 *  acho que aqui valia primeiro definir o usuário
-                 *  val usuario = listaUsuarios.find { it.email == emailLogin && it.senha == senhaLogin} ?:
-                 *  listaOrganizadores.find { it.email == emailLogin && it.senha == senhaLogin}
-                 *
-                 *  as demais verificações são mais baseadas no tipo do usuário
-                 *
-                 *  if (usuario is UsuarioComum)
-                 *  ou
-                 *  if (usuario is Organizador)
-                 *
-                 *  when(usuario) {
-                 *
-                 *  UsuarioComum -> {}
-                 *  Organizador -> {}
-                 *
-                 *  melhora a legibilidade do código também
-                 */
+                // [Critério 9 - Busca Unificada] Vocês procuram em duas listas separadas e depois gerenciam dois objetos distintos ('usuarioLogado' e 'organizadorLogado') por todo o código.
+                // Talvez, se você unificasse a busca usando o operador Elvis '?:', obteria um único objeto e usaria 'when' para tratar cada tipo.
+                // A busca seria feita da seguinte forma:
+                //   val usuarioLogado = listaUsuarios.find { it.email == emailLogin && it.senha == senhaLogin }
+                //       ?: listaOrganizadores.find { it.email == emailLogin && it.senha == senhaLogin }
+                // E o menu separado da seguinte forma:
+                //   when(usuarioLogado) {
+                //       is UsuarioComum -> { /* menu do usuário comum */ }
+                //       is Organizador  -> { /* menu do organizador */ }
+                //   }
+                // [Critério 6 - Separação de Fluxo] Isso também permitiria separar completamente o menu do organizador do menu do usuário comum,
+                // eliminando os 'if(organizadorLogado != null)' / 'else if(usuarioLogado != null)' repetitivos dentro de cada opção.
                 val usuarioLogado = listaUsuarios.find { it.email == emailLogin && it.senha == senhaLogin}
                 val organizadorLogado = listaOrganizadores.find { it.email == emailLogin && it.senha == senhaLogin}
 
 
+                // [Critério 13 - Operador ?.] Com a busca unificada sugerida acima, você poderia simplificar toda essa verificação para:
+                //   if (usuarioLogado?.ativo == true) { ... }
+                // O operador '?.' já lida com o null de forma segura, eliminando o 'if != null' externo.
                 //vocês poderiam deixar apenas esse if, pois o ?. faz a checagem do null
                 // if(usuario?.ativo == true)
                 if (usuarioLogado != null || organizadorLogado != null) {
@@ -106,6 +112,23 @@ fun main() {
                         println(lineBar)
                         println(COR.VERDE + "Login realizado com sucesso!" + COR.RESET)
                         println(lineBar)
+                        // [Critério 2 - Loop Adequado] 'while(sessaoAtiva)' usa uma flag booleana como condição de parada, o que é equivalente a um while(true).
+                        // loops while(true) não são uma boa prática de programação, pois dificultam a compreensão da condição de parada.
+                        // [Critério 14 - do..while] Uma sugestão para esse cenário, talvez, fosse você escrever esse laço como do..while:
+                        //   var opcaoMenuLogado: Int
+                        //   do {
+                        //       when(opcaoMenuLogado) { ... }
+                        //       // exibe menu
+                        //       opcaoMenuLogado = readln().toIntOrNull() ?: 0
+                        //   } while(opcaoMenuLogado != 0)
+                        //   println("Realizando logout...")
+                        // [Critério 6 - Separação de Fluxo] Além disso, separar o fluxo do organizador e do usuário comum tornaria o código mais legível:
+                        //   if (usuarioLogado is Organizador) {
+                        //       do { /* menu organizador */ } while(opcao != 0)
+                        //   } else {
+                        //       do { /* menu usuário comum */ } while(opcao != 0)
+                        //   }
+                        // Assim, cada bloco teria apenas as funcionalidades do seu tipo, sem 'if(organizadorLogado != null)' repetitivos.
                         var sessaoAtiva = true
 
                         /* qual a diferença desse cara para um while true?
@@ -148,7 +171,8 @@ fun main() {
 
                           por quê? porque tudo que fosse do usuário comum ficaria em cima
                           e tudo que fosse do organizador em baixo, fica mais fácil de ler o código assim
-                          cada um com sua responsabilidade.
+                          cada um com sua responsabilidade. Até a manutenção seria melhor.
+
 
                          */
                         while (sessaoAtiva) {
@@ -164,6 +188,8 @@ fun main() {
                                 println("4) Gerenciar Eventos")
                                 println(lineBar)
                             }
+                            // [Critério 15 - when no lugar de if..else if] Como só existem dois tipos de usuário,
+                            // o 'else if' aqui pode ser simplificado para um simples 'else', pois se não é organizador, só pode ser usuário comum.
                             //nesse caso só o else basta
                             else if (usuarioLogado != null) {
                                 println("Olá Usuário ${usuarioLogado.nome}!")
@@ -177,6 +203,9 @@ fun main() {
                             println(lineBar)
 
                             println("Escolha: ")
+                            // [Critério 3a - val/var] 'opcaoMenuLogado' é declarada como 'val' dentro do loop, mas deveria ser 'var' fora do laço.
+                            // Talvez, se você a declarasse como 'var opcaoMenuLogado = -1' antes do loop, ela poderia servir como condição de parada do do..while.
+                            // A variável seria declarada da seguinte forma: var opcaoMenuLogado = -1  // declarada fora do while
                             //deveria ser var e ficar fora do laço
                             val opcaoMenuLogado = readln().toIntOrNull() ?: 0
                             println(lineBar)
@@ -188,6 +217,7 @@ fun main() {
                                 }
                                 // --- OPÇÃO 1: MEU PERFIL ---
                                 1 -> {
+                                    //if repetitivo
                                     if (organizadorLogado != null) {
                                         // dados do usuario organizador
                                         println(lineBar)
@@ -216,7 +246,8 @@ fun main() {
                                             println("Perfil de pessoa Física, Sem dados Empresariais cadastrados")
                                         }
                                         println(lineBar)
-                                        println("Pressione enter para voltar")
+                                        println("Pressione enter para voltar") // se a pessoa digitar qualquer coisa
+                                        //ele volta
                                         readln()
                                     }
                                     // Perfil do usuário comum
@@ -244,6 +275,16 @@ fun main() {
                                 // --- OPÇÃO 2: ALTERAR DADOS ---
                                 2 -> {
                                     var alterandoPerfil = true
+                                    // [Critério 2 - Loop Adequado] 'while(alterandoPerfil)' é uma flag booleana equivalente a while(true). Não é uma boa prática de programação.
+                                    // [Critério 14 - do..while] Uma sugestão para esse cenário, talvez, fosse você escrever esse laço como do..while:
+                                    //   var opcaoAlterar: Int
+                                    //   do {
+                                    //       println("1) Nome  2) Senha  0) Cancelar")
+                                    //       opcaoAlterar = readln().toIntOrNull() ?: 0
+                                    //       when(opcaoAlterar) { 1 -> {} 2 -> {} }
+                                    //   } while(opcaoAlterar != 0)
+                                    //outro while true, isso aqui deveria ser um do..while com when no inicio e os prints
+                                    // no final. Condição de parada mal feita.
                                     while (alterandoPerfil) {
                                         if (organizadorLogado != null) {
                                             // Alterar usuário organizador
@@ -266,10 +307,27 @@ fun main() {
                                                     if (novoNome.length >= 2) {
                                                         organizadorLogado.nome = novoNome
                                                         println(COR.VERDE + "Nome atualizado!" + COR.RESET)
-                                                    } else println(COR.VERMELHO + "Nome inválido." + COR.RESET)
+                                                    } else
+                                                        println(COR.VERMELHO + "Nome inválido." + COR.RESET) // melhora a legibilidade
                                                 }
 
                                                 2 -> {
+
+                                                    /*aqui vocês tinham que ter estruturado o código para primeiro lerem a senha atual
+                                                    depois vocês fariam o ciclo da nova senha
+
+                                                    do {
+                                                        // erro
+                                                        // leitura
+                                                    } while(senhaAtual != organizadorLogado.senha)
+
+                                                    do {
+                                                        // erro
+                                                        //leitura
+                                                        //validações prévias
+                                                    } while(novaSenha != novaSenhaConfirmacao)
+
+                                                    */
                                                     print("Digite sua senha atual: ")
                                                     val senhaAtual = readln().trim()
 
@@ -289,6 +347,14 @@ fun main() {
                                                         cicloNovaSenha = false
                                                     }
 
+                                                    //outro while true
+                                                    // [Critério 2 - Loop Adequado] 'while(cicloNovaSenha)' é uma flag booleana equivalente a while(true). Loops while(true) não são uma boa prática de programação, pois dificultam a compreensão da condição de parada.
+                                                    // [Critério 14 - do..while] Uma sugestão para esse cenário, talvez, fosse você escrever esse laço como do..while:
+                                                    //   do {
+                                                    //       print("Nova Senha: "); novaSenha = readln().trim()
+                                                    //       print("Confirme: ");   novaSenhaConfirmacao = readln().trim()
+                                                    //       if (novaSenha.length < 8) println("Senha muito curta")
+                                                    //   } while(novaSenha.isEmpty() || novaSenha.length < 8 || novaSenha != novaSenhaConfirmacao)
                                                     while (cicloNovaSenha) {
                                                         if (novaSenha.isEmpty()){
                                                             println(COR.VERMELHO + "ERRO: " + COR.AMARELO + "A nova senha precisa ser preenchida. Por favor digite uma senha" + COR.RESET)
@@ -307,8 +373,10 @@ fun main() {
                                                 }
 
                                                 3 -> {
+
                                                     println("Novo Gênero (1-Masculino, 2-Feminino, 3-Outros): ")
                                                     val opcaoSexo = readln().toIntOrNull() ?: 3
+                                                    //aaah, boa, você força o gênero ser outros se colocar qualquer outra coisa que não seja 1 e 2
                                                     organizadorLogado.sexo = when (opcaoSexo) {
                                                         1 -> Sexo.MASCULINO; 2 -> Sexo.FEMININO; else -> Sexo.OUTROS
                                                     }
@@ -324,7 +392,8 @@ fun main() {
                                                         val opcaoTornarPJ = readln().toIntOrNull() ?: 2
 
                                                         if (opcaoTornarPJ == 1) {
-                                                            print("Digite o CNPJ (14 números): ")
+                                                            // vocês não pendem de novo? tipo, a pessoa só volta para o menu superior?
+                                                            print("Digite o CNPJ (14 números): ") // o cnpj vai ser alfanumerico
                                                             val novoCnpj = readln().trim()
                                                             if (novoCnpj.length == 14) {
                                                                 print("Razão Social: ")
@@ -341,6 +410,7 @@ fun main() {
                                                             } else {
                                                                 println(COR.VERMELHO + "CNPJ inválido." + COR.RESET)
                                                             }
+
                                                         }
                                                     } else {
                                                         println(COR.AMARELO + "--- EDITAR DADOS DA EMPRESA ---" + COR.RESET)
@@ -350,6 +420,9 @@ fun main() {
                                                         println("0) Voltar")
                                                         val opcaoEmpresa = readln().toIntOrNull() ?: 0
 
+                                                        // [Critério 15 - when no lugar de if..else if] O bloco 'if(opcaoEmpresa == 1) ... else if(opcaoEmpresa == 2)' poderia ser substituído por 'when'.
+                                                        // Talvez, se você adotasse 'when(opcaoEmpresa)', o código ficaria mais legível e idiomático em Kotlin:
+                                                        // when(opcaoEmpresa) { 1 -> { /* editar */ } 2 -> { /* corrigir CNPJ */ } }
                                                         if (opcaoEmpresa == 1) {
                                                             print("Nova Razão Social: ")
                                                             organizadorLogado.razaoSocial = readln().trim()
@@ -419,6 +492,8 @@ fun main() {
                                                         cicloNovaSenha = false
                                                     }
 
+                                                    // [Critério 2 - Loop Adequado] 'while(cicloNovaSenha)' (usuário comum) — mesma situação do organizador acima. Não é uma boa prática.
+                                                    // [Critério 14 - do..while] Prefira do..while com a condição de parada explícita.
                                                     while (cicloNovaSenha) {
                                                         if (novaSenha.isEmpty()){
                                                             println(COR.VERMELHO + "ERRO: " + COR.AMARELO + "A nova senha precisa ser preenchida. Por favor digite uma senha" + COR.RESET)
@@ -471,6 +546,7 @@ fun main() {
 
                                             // Verifica se existem eventos ativos ou em andamento
                                             val possuiEventosAtivos = listaEventos.any { evento ->
+                                                //essa verificação não deveria ser baseada em chave, mas em objetos
                                                 evento.idOrganizador == organizadorLogado.email &&
                                                         evento.ativo &&
                                                         agora.isBefore(evento.dataFim) // cobre eventos futuros e em andamento
@@ -503,7 +579,17 @@ fun main() {
                                 // --- OPÇÃO 4: FUNCIONALIDADES DAS TAREFAS 2 E 3 ---
                                 4 -> {
                                     if (organizadorLogado != null) {
+                                        //while true não é uma boa prática deveria ser um do..while com a leitura da
+                                        // opção no final e a condição de parada baseada na opção de saída
                                         var menuEventos = true
+                                        // [Critério 2 - Loop Adequado] 'while(menuEventos)' é uma flag booleana equivalente a while(true). Loops while(true) não são uma boa prática de programação.
+                                        // [Critério 14 - do..while] Uma sugestão para esse cenário, talvez, fosse você escrever esse laço como do..while:
+                                        //   var opEventos: Int
+                                        //   do {
+                                        //       println("1) Cadastrar  2) Listar  3) Alterar  4) Ativar/Desativar  0) Voltar")
+                                        //       opEventos = readln().toIntOrNull() ?: 0
+                                        //       when(opEventos) { 1 -> {} 2 -> {} 3 -> {} 4 -> {} }
+                                        //   } while(opEventos != 0)
                                         while (menuEventos) {
                                             println("\n" + lineBar)
                                             println(COR.AZUL + "--- GERENCIAMENTO DE EVENTOS ---" + COR.RESET)
@@ -532,7 +618,16 @@ fun main() {
                                                     var dataIniEv: LocalDateTime? = null
                                                     var dataFimEv: LocalDateTime? = null
                                                     var datasValidas = false
-
+                                                    // [Critério 2 - Loop Adequado] 'while(!datasValidas)' é uma flag booleana equivalente a while(true). Não é uma boa prática de programação.
+                                                    // [Critério 14 - do..while] Uma sugestão para esse cenário, talvez, fosse você escrever esse laço como do..while, pois a leitura ocorre ao menos uma vez:
+                                                    //   do {
+                                                    //       try {
+                                                    //           print("Início: "); dataIniEv = LocalDateTime.parse(readln(), formatterHora)
+                                                    //           print("Fim: ");    dataFimEv = LocalDateTime.parse(readln(), formatterHora)
+                                                    //           datasValidas = dataIniEv.isAfter(agora) && dataFimEv.isAfter(dataIniEv)
+                                                    //               && Duration.between(dataIniEv, dataFimEv).toMinutes() >= 30
+                                                    //       } catch (e: Exception) { println("Formato inválido") }
+                                                    //   } while(!datasValidas)
                                                     while (!datasValidas) {
                                                         try {
                                                             print("Início (dd/MM/yyyy HH:mm): ")
@@ -584,6 +679,9 @@ fun main() {
                                                     print("Capacidade Máxima de Pessoas: ")
                                                     val capEv = readln().toIntOrNull() ?: 10
                                                     print("Preço do Ingresso (0 para gratuito): ")
+                                                    // [Critério 8 - Valores Financeiros] 'precoEv' é declarado como 'Double'. Valores financeiros podem ter imprecisão com Double.
+                                                    // Talvez, se você usasse 'BigDecimal', as operações de soma (evento principal + secundário) ficariam mais precisas.
+                                                    // A variável seria declarada da seguinte forma: val precoEv = readln().toBigDecimalOrNull() ?: BigDecimal.ZERO
                                                     val precoEv = readln().toDoubleOrNull() ?: 0.0
 
 
@@ -591,6 +689,8 @@ fun main() {
                                                     print("Permite estorno em caso de cancelamento? (1-Sim, 2-Não): ")
                                                     val estornoOp = readln().toIntOrNull() ?: 2
                                                     val permiteEstorno = (estornoOp == 1)
+                                                    // [Critério 8 - Valores Financeiros] 'taxaEstorno' é 'Double'. Talvez, se você usasse 'BigDecimal', o cálculo do valor estornado ficaria mais preciso.
+                                                    // A variável seria declarada da seguinte forma: var taxaEstorno: BigDecimal = BigDecimal.ZERO
                                                     var taxaEstorno = 0.0
                                                     if (permiteEstorno) {
                                                         print("Qual a taxa de estorno (ex: 10.0 para 10%): ")
@@ -608,6 +708,13 @@ fun main() {
                                                             "\n1) Ativo" +
                                                             "\n2) Inativo\n\n")
                                                     val inputStatusEv = readln().toIntOrNull() ?: 2
+                                                    // [Critério 3a - val/var] 'statusEv' é 'var', mas poderia ser 'val' pois seu valor é definido uma única vez.
+                                                    // [Critério 4 - when como expressão] O bloco if/else if abaixo poderia ser substituído por 'when' como expressão, que é mais idiomático em Kotlin.
+                                                    // [Critério 15 - when no lugar de if..else if] Talvez, se você usasse 'when' como expressão, ficaria mais claro e conciso:
+                                                    //   val statusEv: Boolean = when (inputStatusEv) {
+                                                    //       1 -> { println("Este evento foi definido como Ativo."); true }
+                                                    //       else -> { println("Este evento foi definido como Inativo."); false }
+                                                    //   }
                                                     var statusEv = false
                                                     if (inputStatusEv == 1){
                                                         println("Este evento foi definido como Ativo.")
@@ -798,6 +905,14 @@ fun main() {
                                     } else if (usuarioLogado != null) {
                                         // === MENU DO FEED DE EVENTOS (US 11-14) ===
                                         var menuFeedAtivo = true
+                                        // [Critério 2 - Loop Adequado] 'while(menuFeedAtivo)' é uma flag booleana equivalente a while(true). Não é uma boa prática de programação.
+                                        // [Critério 14 - do..while] Uma sugestão para esse cenário, talvez, fosse você escrever esse laço como do..while:
+                                        //   var opcaoFeed: Int
+                                        //   do {
+                                        //       println("1) Feed  2) Comprar  3) Cancelar  4) Meus Ingressos  0) Voltar")
+                                        //       opcaoFeed = readln().toIntOrNull() ?: 0
+                                        //       when(opcaoFeed) { 1 -> {} 2 -> {} ... }
+                                        //   } while(opcaoFeed != 0)
                                         val formatterDataHora = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
 
                                         while (menuFeedAtivo) {
@@ -829,6 +944,11 @@ fun main() {
                                                     val eventosDisponiveis = mutableListOf<Evento>()
                                                     val agora = LocalDateTime.now()
 
+                                                    // [Critério 10 - filter/find] O laço 'for' abaixo com 'continue' e 'add' manual pode ser substituído por 'filter', que é mais conciso e idiomático.
+                                                    // [Critério 12 - forEach] Além disso, a variável 'eventosDisponiveis' poderia ser declarada diretamente com o resultado do 'filter', eliminando o 'mutableListOf' desnecessário:
+                                                    // Talvez, se você usasse:
+                                                    //   val eventosDisponiveis = listaEventos.filter { it.ativo && it.dataFim.isAfter(agora) && it.ingressosVendidos < it.capacidadeTotal }
+                                                    // o código ficaria mais legível e declarativo.
                                                     for (evento in listaEventos) {
                                                         if (!evento.ativo) continue
                                                         if (evento.dataFim.isBefore(agora)) continue
@@ -839,6 +959,10 @@ fun main() {
                                                     if (eventosDisponiveis.isEmpty()) {
                                                         println(COR.AMARELO + "Não há eventos disponíveis no momento." + COR.RESET)
                                                     } else {
+                                                        // [Critério 10 - filter/find] O Bubble Sort implementado manualmente pode ser substituído pelo método 'sortedWith' do Kotlin, que é mais eficiente e legível.
+                                                        // Talvez, se você usasse:
+                                                        //   val eventosOrdenados = eventosDisponiveis.sortedWith(compareBy({ it.dataInicio }, { it.nome }))
+                                                        // o código ficaria mais conciso e expressivo.
                                                         // Bubble sort por data
                                                         for (i in 0 until eventosDisponiveis.size - 1) {
                                                             for (j in 0 until eventosDisponiveis.size - i - 1) {
@@ -863,6 +987,11 @@ fun main() {
                                                         println(COR.VERDE + "Eventos disponíveis: ${eventosDisponiveis.size}" + COR.RESET)
                                                         println()
 
+                                                        // [Critério 16 - forEachIndexed] A variável 'contador' manual pode ser eliminada usando 'forEachIndexed'.
+                                                        // [Critério 12 - forEach] Além disso, o 'for' poderia ser substituído por 'forEachIndexed' para ser mais idiomático em Kotlin:
+                                                        // Talvez, se você usasse:
+                                                        //   eventosDisponiveis.forEachIndexed { index, evento -> println("[${index + 1}] ${evento.nome}") }
+                                                        // o código ficaria mais limpo, sem necessidade de gerenciar a variável 'contador' manualmente.
                                                         var contador = 1
                                                         for (evento in eventosDisponiveis) {
                                                             println("${COR.AZUL}[$contador]${COR.RESET} ${COR.NEGRITO}${evento.nome}${COR.RESET}")
@@ -889,6 +1018,11 @@ fun main() {
                                                             println("Vagas: $vagasDisponiveis/${evento.capacidadeTotal}")
 
                                                             // CORREÇÃO 1: Buscar organizador pelo e-mail
+                                                            // [Critério 10 - filter/find] O laço 'for' com 'break' para buscar o nome do organizador pode ser substituído por 'find'.
+                                                            // [Critério 13 - Operador ?.] Com 'find' e '?.', o código fica mais seguro e conciso:
+                                                            // Talvez, se você usasse:
+                                                            //   val nomeOrganizador = listaOrganizadores.find { it.email == evento.idOrganizador }?.nome ?: "Desconhecido"
+                                                            // você eliminaria o 'for', o 'break' e a variável 'var nomeOrganizador' mutável.
                                                             var nomeOrganizador = "Desconhecido"
                                                             for (org in listaOrganizadores) {
                                                                 if (org.email == evento.idOrganizador.toString()) {
@@ -898,6 +1032,10 @@ fun main() {
                                                             }
                                                             println("Organizador: $nomeOrganizador")
 
+                                                            // [Critério 11 - any] A variável 'jaTemIngresso' com o laço 'for' e 'break' pode ser substituída pela função 'any', que é mais idiomática e concisa.
+                                                            // [Critério 13 - Operador ?.] Talvez, se você usasse:
+                                                            //   val jaTemIngresso = listaIngressos.any { it.idUsuario == listaUsuarios.indexOf(usuarioLogado) && it.idEvento == evento.id && it.status == StatusIngresso.ATIVO }
+                                                            // o código ficaria mais legível e sem a necessidade do 'break'.
                                                             var jaTemIngresso = false
                                                             for (ingresso in listaIngressos) {
                                                                 if (ingresso.idUsuario == listaUsuarios.indexOf(
@@ -930,6 +1068,11 @@ fun main() {
                                                     val eventosDisponiveis = mutableListOf<Evento>()
                                                     val agora = LocalDateTime.now()
 
+                                                    // [Critério 10 - filter/find] O laço 'for' abaixo pode ser substituído por 'filter', que é mais idiomático e conciso.
+                                                    // [Critério 5 - Tipo de Coleção] Com 'filter', a variável 'eventosDisponiveis' poderia ser um 'val' imutável (listOf):
+                                                    // Talvez, se você usasse:
+                                                    //   val eventosDisponiveis = listaEventos.filter { it.ativo && it.dataFim.isAfter(agora) && it.ingressosVendidos < it.capacidadeTotal }
+                                                    // o código ficaria mais limpo.
                                                     for (evento in listaEventos) {
                                                         if (evento.ativo && evento.dataFim.isAfter(agora) && evento.ingressosVendidos < evento.capacidadeTotal) {
                                                             eventosDisponiveis.add(evento)
@@ -939,6 +1082,10 @@ fun main() {
                                                     if (eventosDisponiveis.isEmpty()) {
                                                         println(COR.AMARELO + "Não há eventos disponíveis para compra." + COR.RESET)
                                                     } else {
+                                                        // [Critério 10 - filter/find] O Bubble Sort manual aqui (mesmo padrão do feed) pode ser substituído por 'sortedWith':
+                                                        // Talvez, se você usasse:
+                                                        //   val eventosOrdenados = eventosDisponiveis.sortedWith(compareBy({ it.dataInicio }, { it.nome }))
+                                                        // o código ficaria mais legível e sem duplicação de lógica de ordenação.
                                                         // Ordenação
                                                         for (i in 0 until eventosDisponiveis.size - 1) {
                                                             for (j in 0 until eventosDisponiveis.size - i - 1) {
@@ -952,6 +1099,9 @@ fun main() {
                                                             }
                                                         }
 
+                                                        // [Critério 16 - forEachIndexed] A variável 'contador' manual aqui pode ser eliminada com 'forEachIndexed', assim como no feed de eventos.
+                                                        // [Critério 12 - forEach] Talvez, se você usasse:
+                                                        //   eventosDisponiveis.forEachIndexed { index, evento -> println("[${index + 1}] ${evento.nome}  R$ %.2f".format(evento.preco)) }
                                                         var contador = 1
                                                         for (evento in eventosDisponiveis) {
                                                             val vagas =
@@ -977,6 +1127,9 @@ fun main() {
                                                                 println(COR.VERMELHO + "ERRO: Evento lotado!" + COR.RESET)
                                                             } else {
                                                                 var jaTemIngresso = false
+                                                                // [Critério 11 - any] Mesmo padrão de 'jaTemIngresso' visto no feed. Substitua o laço 'for' + 'break' pela função 'any'.
+                                                                // Talvez, se você usasse:
+                                                                //   val jaTemIngresso = listaIngressos.any { it.idUsuario == listaUsuarios.indexOf(usuarioLogado) && it.idEvento == eventoEscolhido.id && it.status == StatusIngresso.ATIVO }
                                                                 for (ing in listaIngressos) {
                                                                     if (ing.idUsuario == listaUsuarios.indexOf(
                                                                             usuarioLogado
@@ -993,6 +1146,10 @@ fun main() {
                                                                     println(COR.AMARELO + "Você já possui ingresso para este evento!" + COR.RESET)
                                                                 } else {
                                                                     var eventoVinculado: Evento? = null
+                                                                    // [Critério 10 - filter/find] O laço 'for' com 'break' para buscar o evento vinculado pode ser substituído por 'find'.
+                                                                    // [Critério 13 - Operador ?.] Talvez, se você usasse:
+                                                                    //   val eventoVinculado = eventoEscolhido.idEventoVinculado?.let { id -> listaEventos.find { it.id == id } }
+                                                                    // o código ficaria mais conciso e sem a necessidade do 'if != null' e do laço manual.
                                                                     if (eventoEscolhido.idEventoVinculado != null) {
                                                                         for (ev in listaEventos) {
                                                                             if (ev.id == eventoEscolhido.idEventoVinculado) {
@@ -1112,6 +1269,9 @@ fun main() {
                                                     println(lineBar)
 
                                                     val ingressosAtivos = mutableListOf<Ingresso>()
+                                                    // [Critério 10 - filter/find] O laço 'for' abaixo pode ser substituído por 'filter', que é mais idiomático:
+                                                    // Talvez, se você usasse:
+                                                    //   val ingressosAtivos = listaIngressos.filter { it.idUsuario == listaUsuarios.indexOf(usuarioLogado) && it.status == StatusIngresso.ATIVO }
                                                     for (ingresso in listaIngressos) {
                                                         if (ingresso.idUsuario == listaUsuarios.indexOf(usuarioLogado) && ingresso.status == StatusIngresso.ATIVO) {
                                                             ingressosAtivos.add(ingresso)
@@ -1121,10 +1281,17 @@ fun main() {
                                                     if (ingressosAtivos.isEmpty()) {
                                                         println(COR.AMARELO + "Você não possui ingressos ativos para cancelar." + COR.RESET)
                                                     } else {
+                                                        // [Critério 16 - forEachIndexed] A variável 'contador' manual pode ser substituída por 'forEachIndexed'.
+                                                        // [Critério 12 - forEach] Talvez, se você usasse:
+                                                        //   ingressosAtivos.forEachIndexed { index, ingresso -> println("[${index + 1}] ...") }
                                                         var contador = 1
                                                         for (ingresso in ingressosAtivos) {
                                                             var eventoNome = "Desconhecido"
                                                             var eventoData = ""
+                                                            // [Critério 10 - filter/find] O laço 'for' com 'break' para buscar o evento pode ser substituído por 'find':
+                                                            // Talvez, se você usasse:
+                                                            //   val eventoDoIngresso = listaEventos.find { it.id == ingresso.idEvento }
+                                                            //   val eventoNome = eventoDoIngresso?.nome ?: "Desconhecido"
                                                             for (evento in listaEventos) {
                                                                 if (evento.id == ingresso.idEvento) {
                                                                     eventoNome = evento.nome
@@ -1146,6 +1313,10 @@ fun main() {
                                                         if (escolha in 1..ingressosAtivos.size) {
                                                             val ingressoEscolhido = ingressosAtivos[escolha - 1]
                                                             var eventoIngresso: Evento? = null
+                                                            // [Critério 10 - filter/find] O laço 'for' com 'break' para buscar o evento do ingresso pode ser substituído por 'find':
+                                                            // [Critério 13 - Operador ?.] Talvez, se você usasse:
+                                                            //   val eventoIngresso = listaEventos.find { it.id == ingressoEscolhido.idEvento }
+                                                            // o código ficaria mais conciso e sem a necessidade do laço manual.
                                                             for (evento in listaEventos) {
                                                                 if (evento.id == ingressoEscolhido.idEvento) {
                                                                     eventoIngresso = evento
@@ -1157,6 +1328,8 @@ fun main() {
                                                                 println("\n$lineBar")
                                                                 println("Cancelar ingresso de: ${COR.NEGRITO}${eventoIngresso.nome}${COR.RESET}")
 
+                                                                // [Critério 8 - Valores Financeiros] 'valorEstorno' é 'Double'. Talvez, se você usasse 'BigDecimal', o cálculo do estorno ficaria mais preciso.
+                                                                // A variável seria declarada da seguinte forma: var valorEstorno: BigDecimal = BigDecimal.ZERO
                                                                 var valorEstorno = 0.0
                                                                 // CORREÇÃO 2: Acessando a propriedade estornaDinheiro corretamente
                                                                 if (eventoIngresso.estornaDinheiro) {
@@ -1216,6 +1389,10 @@ fun main() {
                                                     println(lineBar)
 
                                                     val meusIngressos = mutableListOf<Ingresso>()
+                                                    // [Critério 10 - filter/find] O laço 'for' abaixo pode ser substituído por 'filter'.
+                                                    // [Critério 5 - Tipo de Coleção] Com 'filter', 'meusIngressos' poderia ser 'val' (imutável):
+                                                    // Talvez, se você usasse:
+                                                    //   val meusIngressos = listaIngressos.filter { it.idUsuario == listaUsuarios.indexOf(usuarioLogado) }
                                                     for (ingresso in listaIngressos) {
                                                         if (ingresso.idUsuario == listaUsuarios.indexOf(usuarioLogado)) {
                                                             meusIngressos.add(ingresso)
@@ -1231,6 +1408,10 @@ fun main() {
 
                                                         for (ingresso in meusIngressos) {
                                                             var eventoEncontrado: Evento? = null
+                                                            // [Critério 10 - filter/find] O laço 'for' com 'break' pode ser substituído por 'find'.
+                                                            // [Critério 13 - Operador ?.] Talvez, se você usasse:
+                                                            //   val eventoEncontrado = listaEventos.find { it.id == ingresso.idEvento }
+                                                            // o código ficaria mais conciso, sem laço manual e sem necessidade do 'break'.
                                                             for (evento in listaEventos) {
                                                                 if (evento.id == ingresso.idEvento) {
                                                                     eventoEncontrado = evento
@@ -1251,6 +1432,9 @@ fun main() {
                                                             }
                                                         }
 
+                                                        // [Critério 10 - filter/find] Os dois Bubble Sorts abaixo (ativos e inativos) repetem a mesma lógica de ordenação vista em outras partes do código.
+                                                        // Talvez, se você usasse 'sortedWith' diretamente após o 'filter', evitaria a duplicação e o código ficaria mais legível:
+                                                        //   val ingressosAtivos = meusIngressos.filter { ... }.sortedWith(compareBy({ listaEventos.find { e -> e.id == it.idEvento }?.dataInicio }, { ... }))
                                                         // Ordenação
                                                         for (i in 0 until ingressosAtivos.size - 1) {
                                                             for (j in 0 until ingressosAtivos.size - i - 1) {
@@ -1281,6 +1465,8 @@ fun main() {
                                                         if (ingressosAtivos.isNotEmpty()) {
                                                             println(COR.VERDE + "EVENTOS ATIVOS (${ingressosAtivos.size})" + COR.RESET)
                                                             println(lineBar)
+                                                            // [Critério 12 - forEach] O 'for' abaixo poderia ser substituído por 'forEach', que é mais idiomático em Kotlin:
+                                                            // Talvez, se você usasse: ingressosAtivos.forEach { (ing, evt) -> println(evt.nome) }
                                                             for (par in ingressosAtivos) {
                                                                 val ing = par.first
                                                                 val evt = par.second
@@ -1297,6 +1483,7 @@ fun main() {
                                                         if (ingressosInativos.isNotEmpty()) {
                                                             println(COR.AMARELO + "EVENTOS FINALIZADOS/CANCELADOS (${ingressosInativos.size})" + COR.RESET)
                                                             println(lineBar)
+                                                            // [Critério 12 - forEach] O 'for' abaixo poderia ser substituído por 'forEach'.
                                                             for (par in ingressosInativos) {
                                                                 val ing = par.first
                                                                 val evt = par.second
@@ -1304,6 +1491,8 @@ fun main() {
                                                                 println("ID Ingresso: #${ing.id}")
                                                                 println("${evt.dataInicio.format(formatterDataHora)}")
                                                                 println("R$ %.2f".format(ing.precoPago))
+                                                                // [Critério 15 - when no lugar de if..else if] O bloco 'if/else' abaixo poderia ser substituído por 'when' como expressão.
+                                                                // Talvez, se você usasse: println("Status: ${when(ing.status) { StatusIngresso.CANCELADO -> ... else -> ... }}")
                                                                 if (ing.status == StatusIngresso.CANCELADO) {
                                                                     println("Status: ${COR.VERMELHO}CANCELADO${COR.RESET}")
                                                                 } else {
@@ -1367,13 +1556,54 @@ fun main() {
                                         var senha = ""
                                         var dataNascimento : LocalDate = LocalDate.now()
                                         var sexo : Sexo = Sexo.OUTROS
+                                        // [Critério 3a - val/var] 'ativo' é declarado como 'val' mas nunca é utilizado no código — o valor padrão 'true' da data class já cuida disso.
+                                        // Talvez, se você removesse essa variável, o código ficaria mais limpo.
                                         val ativo: Boolean = true
 
                                         // Para a verificação de idade na data de nascimento
                                         val idadeMinima = 12
 
+                                        // [Critério 2 - Loop Adequado] 'while(cicloCriarUsuarioComum)' é uma flag booleana equivalente a while(true). Não é uma boa prática.
+                                        // [Critério 14 - do..while] Todo o fluxo de cadastro é executado ao menos uma vez, o que torna o 'do..while' mais adequado.
                                         while (cicloCriarUsuarioComum) {
+                                            // [Critério 2 - Loop Adequado] 'while(cicloEmail)' é também uma flag booleana. O 'do..while' seria mais adequado:
+                                            // do { lê o email; valida } while(email inválido ou duplicado)
                                             while (cicloEmail) {
+                                                println("Vamos criar um usuário comum então")
+                                                println(lineBar)
+                                                print("\nDigite seu email: ")
+                                                val inputEmail = readln().trim()
+                                                // Verificação de formato correto do email, critério: Conter o @ e 5 ou mais caracteres
+                                                if (inputEmail.contains("@") && inputEmail.length >= 5) {
+                                                    // Variáveis para verificação de duplicidade de email nos usuários comuns e organizadores
+                                                    val verificarDuplicidadeEmailUsuarioComum =
+                                                        listaUsuarios.any { it.email == inputEmail }
+                                                    val verificarDuplicidadeEmailOrganizador =
+                                                        listaOrganizadores.any { it.email == inputEmail }
+                                                    // Condicional Verificando emails duplicados
+                                                    if (verificarDuplicidadeEmailUsuarioComum || verificarDuplicidadeEmailOrganizador) {
+                                                        println(COR.VERMELHO + "ERRO: " + COR.AMARELO + " Email informado ja cadastrado, por favor efetue o login ou utilize um email diferente" + COR.RESET)
+                                                    } else {
+                                                        println(COR.VERDE + "E-mail válido e disponível. Prosseguindo..." + COR.RESET)
+                                                        email = inputEmail
+                                                        cicloEmail = false
+                                                    }
+                                                } else {
+                                                    println(
+                                                        COR.VERMELHO + "ERRO: " + COR.AMARELO + "Email no formato incorreto. O e-mail precisa ter '@' e possuir mais de 4 caracteres\n" +
+                                                                " Por favor digite novamente" + COR.RESET
+                                                    )
+                                                }
+                                            }
+
+                                            // [Critério 2 - Loop Adequado] 'while(cicloSenha)' (usuário comum) é uma flag booleana equivalente a while(true). Não é uma boa prática.
+                                            // [Critério 14 - do..while] Uma sugestão para esse cenário, talvez, fosse você escrever esse laço como do..while:
+                                            //   do {
+                                            //       print("Senha: "); inputSenha = readln().trim()
+                                            //       print("Confirme: "); inputSenhaConfirmacao = readln().trim()
+                                            //   } while(inputSenha.isEmpty() || inputSenha.length < 8 || inputSenha != inputSenhaConfirmacao)
+                                            // [Critério 15 - when no lugar de if..else if] A cadeia de if/else if para validar a senha poderia ser substituída por 'when'.
+                                            while (cicloSenha){
                                                 println("Vamos criar um usuário comum então")
                                                 println(lineBar)
                                                 print("\nDigite seu email: ")
@@ -1423,6 +1653,9 @@ fun main() {
                                                 }
                                             }
 
+                                            // [Critério 2 - Loop Adequado] 'while(cicloNome)' (usuário comum) é uma flag booleana equivalente a while(true). Não é uma boa prática.
+                                            // [Critério 14 - do..while] Uma sugestão para esse cenário, talvez, fosse você escrever esse laço como do..while:
+                                            //   do { print("Nome: "); inputNome = readln() } while(inputNome.trim().length < 2)
                                             while (cicloNome) {
                                                 println(lineBar)
                                                 print("\nDigite seu Nome: ")
@@ -1448,6 +1681,10 @@ fun main() {
                                                 }
                                             }
                                             println(COR.VERDE + "Gênero cadastrado com sucesso! Prosseguindo..." + COR.RESET)
+                                            // [Critério 2 - Loop Adequado] 'while(cicloDataNascimento)' (usuário comum) é uma flag booleana equivalente a while(true). Não é uma boa prática.
+                                            // [Critério 14 - do..while] Uma sugestão para esse cenário, talvez, fosse você escrever esse laço como do..while:
+                                            //   do { lê a data; valida formato e idade } while(data inválida)
+                                            // [Critério 15 - when no lugar de if..else if] A cadeia de if/else if para validar a data poderia ser substituída por 'when'.
                                             while (cicloDataNascimento) {
                                                 println(lineBar)
                                                 val hoje = LocalDate.now()
@@ -1524,6 +1761,8 @@ fun main() {
                                         var senha = ""
                                         var dataNascimento : LocalDate = LocalDate.now()
                                         var sexo : Sexo = Sexo.OUTROS
+                                        // [Critério 3a - val/var] 'ativo' é declarado como 'val' mas nunca é utilizado — o valor padrão 'true' da data class já cuida disso.
+                                        // Talvez, se você removesse essa variável, o código ficaria mais limpo.
                                         val ativo: Boolean = true
 
                                         // Dados opcionais da empresa
@@ -1534,7 +1773,11 @@ fun main() {
                                         // Para a verificação de idade na data de nascimento
                                         val idadeMinima = 18
 
+                                        // [Critério 2 - Loop Adequado] 'while(cicloCriarOrganizador)' é uma flag booleana equivalente a while(true). Não é uma boa prática.
+                                        // [Critério 14 - do..while] Todo o fluxo de cadastro é executado ao menos uma vez, o que torna o 'do..while' mais adequado.
                                         while (cicloCriarOrganizador) {
+                                            // [Critério 2 - Loop Adequado] 'while(cicloEmail)' é também uma flag booleana. O 'do..while' seria mais adequado:
+                                            // do { lê o email; valida } while(email inválido ou duplicado)
                                             while (cicloEmail) {
                                                 println("Vamos criar um usuário organizador então")
                                                 println(lineBar)
@@ -1585,6 +1828,9 @@ fun main() {
                                                 }
                                             }
 
+                                            // [Critério 2 - Loop Adequado] 'while(cicloNome)' (organizador) é uma flag booleana equivalente a while(true). Não é uma boa prática.
+                                            // [Critério 14 - do..while] Uma sugestão para esse cenário, talvez, fosse você escrever esse laço como do..while:
+                                            //   do { print("Nome: "); inputNome = readln() } while(inputNome.trim().length < 2)
                                             while (cicloNome) {
                                                 println(lineBar)
                                                 print("\nDigite seu Nome: ")
@@ -1610,6 +1856,10 @@ fun main() {
                                                 }
                                             }
                                             println(COR.VERDE + "Gênero cadastrado com sucesso! Prosseguindo..." + COR.RESET)
+                                            // [Critério 2 - Loop Adequado] 'while(cicloDataNascimento)' (organizador) é uma flag booleana equivalente a while(true). Não é uma boa prática.
+                                            // [Critério 14 - do..while] Uma sugestão para esse cenário, talvez, fosse você escrever esse laço como do..while:
+                                            //   do { lê a data; valida formato e idade } while(data inválida)
+                                            // [Critério 15 - when no lugar de if..else if] A cadeia de if/else if para validar a data poderia ser substituída por 'when'.
                                             while (cicloDataNascimento) {
                                                 println(lineBar)
                                                 val hoje = LocalDate.now()
@@ -1652,6 +1902,13 @@ fun main() {
 
                                             // cadastro de dados da empresa
                                             var cadastrarEmpresa = true
+                                            // [Critério 2 - Loop Adequado] 'while(cadastrarEmpresa)' é uma flag booleana equivalente a while(true). Não é uma boa prática.
+                                            // [Critério 14 - do..while] Uma sugestão para esse cenário, talvez, fosse você escrever esse laço como do..while:
+                                            //   do {
+                                            //       println("1) Sou PJ  2) Sou PF")
+                                            //       val isEmpresa = readln().toIntOrNull() ?: 2
+                                            //       if(isEmpresa == 1) { lê CNPJ, razão social, nome fantasia }
+                                            //   } while(isEmpresa == 1 && cnpj?.length != 14)
                                             while (cadastrarEmpresa) {
                                                 println(lineBar)
                                                 println("Você representa uma Empresa/Instituição?")
@@ -1728,6 +1985,15 @@ fun main() {
                                 val organizadorEncontrado = listaOrganizadores.find { it.email == emailBusca && it.senha == senhaBusca }
 
                                 // Lógica de Reativação
+                                // [Critério 9 - Busca Unificada] A lógica de busca aqui também poderia ser unificada usando o operador Elvis '?:':
+                                //   val contaEncontrada = listaUsuarios.find { it.email == emailBusca && it.senha == senhaBusca }
+                                //       ?: listaOrganizadores.find { it.email == emailBusca && it.senha == senhaBusca }
+                                // [Critério 15 - when no lugar de if..else if] E o bloco if/else if poderia ser substituído por 'when':
+                                //   when(contaEncontrada) {
+                                //       is UsuarioComum -> { if(!it.ativo) { it.ativo = true; println("Conta reativada!") } else println("Já está ativa.") }
+                                //       is Organizador  -> { if(!it.ativo) { it.ativo = true; println("Conta reativada!") } else println("Já está ativa.") }
+                                //       null -> println("Conta não encontrada.")
+                                //   }
                                 if (usuarioEncontrado != null) {
                                     if (!usuarioEncontrado.ativo) {
                                         usuarioEncontrado.ativo = true
@@ -1738,6 +2004,7 @@ fun main() {
                                         println(COR.AMARELO + "Atenção: Sua conta já está ativa. Basta fazer login." + COR.RESET)
                                     }
                                 }
+                                // [Critério 15 - when no lugar de if..else if] O 'else if' aqui poderia ser substituído por 'when', conforme sugestão acima.
                                 else if (organizadorEncontrado != null) {
                                     if (!organizadorEncontrado.ativo) {
                                         organizadorEncontrado.ativo = true
